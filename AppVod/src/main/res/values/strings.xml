@@ -1,0 +1,300 @@
+<resources>
+    <string name="app_name">theLoop KTV</string>
+
+    <string name="label_accept">確定</string>
+
+    <string name="label_cancel">取消</string>
+
+    <string name="label_launcher">啟動中</string>
+
+    <string name="label_room_setting">初始化設定</string>
+
+    <string name="label_music_cut">切歌</string>
+
+    <string name="label_music_original_vocal">原唱</string>
+
+    <string name="label_music_backing_vocal">伴唱</string>
+
+    <string name="label_music_guide_vocal">導唱</string>
+
+    <string name="label_music_pause">暫停</string>
+
+    <string name="label_music_replay">重唱</string>
+
+    <string name="label_music_play">播放</string>
+
+    <string name="label_music_mute">靜音</string>
+
+    <string name="label_music_situation">一鍵情境</string>
+
+    <string name="label_music_score">評分</string>
+
+    <string name="label_app_lint">手機連線</string>
+
+    <string name="label_music_mic">麥克風</string>
+
+    <string name="label_music_mic_add">聲音增加</string>
+
+    <string name="label_music_mic_dec">聲音減少</string>
+
+    <string name="label_music_speaker">喇叭</string>
+
+    <string name="label_music_speaker_add">喇叭增加</string>
+
+    <string name="label_music_speaker_dec">喇叭減少</string>
+
+    <string name="label_music_eq">調音</string>
+
+    <string name="label_home">首頁</string>
+
+    <string name="label_request">點播</string>
+
+    <string name="label_order">點餐</string>
+
+    <string name="label_social">社群</string>
+
+    <string name="label_my_page">我的主頁</string>
+
+
+    <string name="hint_room_name">包廂號碼</string>
+
+
+    <string name="hint_portal_server_ip">伺服器位址</string>
+
+    <string name="hint_environmental_ip">環控位址</string>
+
+    <string name="hint_cut_locked">切歌過於頻繁，請稍後再試</string>
+
+    <string name="toast_command_success">命令發送成功</string>
+
+    <string name="toast_command_fail">命令發送失敗</string>
+
+
+    <string name="label_language">語言</string>
+
+    <string name="label_song_order">點播</string>
+
+    <string name="label_song_insert">插播</string>
+
+    <string name="label_food_order">點餐</string>
+
+    <string name="label_service">服務鈴</string>
+
+    <string name="label_notification">通知</string>
+
+    <string name="label_shopping_chart">購物車</string>
+
+    <string name="label_orders">訂單</string>
+
+    <string name="label_cut">切歌</string>
+
+    <string name="label_pause">暫停</string>
+
+    <string name="label_resume">繼續</string>
+
+    <string name="label_vocal_original">原唱</string>
+
+    <string name="label_vocal_backing">伴唱</string>
+
+    <string name="label_vocal_guide">導唱</string>
+
+    <string name="label_mute">靜音</string>
+
+    <string name="label_rate">評分</string>
+
+    <string name="label_app_link">APP</string>
+
+    <string name="label_microphone">麥克風</string>
+
+    <string name="label_music_volume">音量</string>
+
+    <string name="label_setting">環控</string>
+
+    <string name="label_basic_light">基礎燈光</string>
+
+    <string name="label_basic_light_1">明亮</string>
+
+    <string name="label_basic_light_2">標準</string>
+
+    <string name="label_basic_light_3">微暗</string>
+
+    <string name="label_basic_light_4">極暗</string>
+
+    <string name="label_sub_mode">情境燈光</string>
+
+    <string name="label_sub_mode_1">派對</string>
+
+    <string name="label_sub_mode_2">動感</string>
+
+    <string name="label_sub_mode_3">都會</string>
+
+    <string name="label_sub_mode_4">流星</string>
+
+    <string name="label_sub_mode_5">星塵</string>
+
+    <string name="label_sub_mode_6">藍天</string>
+
+    <string name="label_sub_mode_7">紫紅</string>
+
+    <string name="label_sub_mode_8">森林</string>
+
+    <string name="label_close_sub_mode">關閉情境燈光</string>
+
+    <string name="label_temperature">室內溫度</string>
+
+    <string name="label_wind_level">冷氣風量</string>
+
+    <string name="air_s">弱</string>
+
+    <string name="air_m">中</string>
+
+    <string name="air_l">強</string>
+
+    <string name="label_effect">歡呼特效</string>
+
+    <string name="cheer_1">歡呼鼓掌</string>
+
+    <string name="cheer_2">閃光四溢</string>
+
+    <string name="cheer_3">號角響起</string>
+
+    <string name="label_cup">杯子</string>
+
+    <string name="label_ice">冰塊</string>
+
+    <string name="label_paper">面紙</string>
+
+    <string name="label_desk_clean">整理桌面</string>
+
+    <string name="label_cell_waiter">呼叫服務生</string>
+
+    <string name="label_checkout">結帳</string>
+
+    <string name="label_send">送出</string>
+
+    <string name="label_light">燈光</string>
+
+    <string name="label_air_conditioner">冷氣</string>
+
+    <string name="label_air_supply">送風</string>
+
+    <string name="label_cheer_effect">歡呼特效</string>
+
+
+    <string name="label_room_mode">房間模式</string>
+
+    <string name="label_mode">模式</string>
+
+    <string name="label_mic_volume">音量</string>
+
+    <string name="label_music_control">音樂</string>
+
+    <string name="label_mic_control">麥克風</string>
+
+    <string name="label_mic_tone">音調</string>
+
+    <string name="label_mic_effect">音效</string>
+
+    <string name="label_mic_echo">回音</string>
+
+    <string name="label_record">錄音</string>
+
+    <string name="label_new_songs">新歌快報</string>
+
+    <string name="label_song_charts">排行榜</string>
+
+    <string name="label_order_song_by_theme">主題點歌</string>
+
+    <string name="label_song_es_chart">電音PARTY點播排行</string>
+
+    <string name="label_searching">歌星/歌曲搜尋</string>
+
+    <string name="label_searching_type_1">男歌手</string>
+
+    <string name="label_searching_type_2">女歌手</string>
+
+    <string name="label_searching_type_3">團體歌手</string>
+
+    <string name="label_searching_type_4">歌曲搜尋</string>
+
+    <string name="label_discount">優惠資訊</string>
+
+    <string name="label_screen_mirror">投屏</string>
+
+    <string name="label_dj_set">DJ組合</string>
+
+    <string name="label_room_control">包廂控制</string>
+
+    <string name="label_suggest_search">建議搜尋</string>
+
+    <string name="label_singer">歌手</string>
+
+    <string name="label_play_list">播放清單</string>
+
+    <string name="label_songs">歌曲</string>
+
+    <string name="label_album">專輯</string>
+
+    <string name="label_more">更多</string>
+
+    <string name="menu_new_ui">切換至新版選單介面</string>
+
+    <string name="menu_old_ui">切換至傳統選單介面</string>
+
+    <string name="menu_room_control">包廂控制</string>
+
+    <string name="menu_screen_sharing">分享畫面</string>
+
+    <string name="menu_change_room_mode">切換包廂風格</string>
+
+    <string name="menu_copyright_disclaimer">著作權宣告</string>
+
+    <string name="menu_help">幫助</string>
+
+    <string name="light_mode_1">昏暗</string>
+
+    <string name="light_mode_2">休閒</string>
+
+    <string name="light_mode_3">朝氣</string>
+
+    <string name="light_mode_4">明亮</string>
+
+
+    <string name="mode_1">歡唱</string>
+
+    <string name="mode_2">派對</string>
+
+    <string name="mode_3">會議</string>
+
+    <string name="mode_4">播放</string>
+
+    <string name="mode_5">弛放</string>
+
+    <string name="mode_1_v">歡\n唱</string>
+
+    <string name="mode_2_v">派\n對</string>
+
+    <string name="mode_3_v">會\n議</string>
+
+    <string name="mode_4_v">播\n放</string>
+
+    <string name="mode_5_v">弛\n放</string>
+
+    <string name="key_type_1">注音</string>
+
+    <string name="key_type_2">拼音</string>
+
+    <string name="key_type_3">英數</string>
+
+    <!--Language string-->
+
+    <string name="lang_chinese_tradition">繁體中文</string>
+
+    <string name="lang_chinese_simple">简体中文</string>
+
+    <string name="lang_us">English</string>
+
+    <string name="lang_japanese">日本語</string>
+
+    <string name="lang_korean">한국인</string>
+</resources>

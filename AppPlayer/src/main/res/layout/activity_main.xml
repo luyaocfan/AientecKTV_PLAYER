@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.MainActivity">
+
+    <fragment
+        android:name="com.aientec.appplayer.fragment.PlayerFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:tag="player" />
+
+
+    <fragment
+        android:name="com.aientec.appplayer.fragment.OsdFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:tag="osd" />
+
+    <fragment
+        android:name="com.aientec.appplayer.fragment.DebugFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:tag="debug" />
+
+    <Button
+        android:id="@+id/test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:visibility="gone" />
+
+</FrameLayout>

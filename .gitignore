@@ -1,0 +1,7 @@
+/local.properties
+/.gradle/
+/.idea/
+/build/
+# Project exclude paths
+/ModInePlayer/build/
+/ModInePlayer/build/intermediates/javac/debug/classes/

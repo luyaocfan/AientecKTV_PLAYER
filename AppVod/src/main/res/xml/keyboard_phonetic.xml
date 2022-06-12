@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
+    android:horizontalGap="1dp"
+    android:keyWidth="48dp"
+    android:keyHeight="48dp"
+    android:verticalGap="1dp">
+    <Row>
+        <Key
+            android:codes="1"
+            android:keyLabel="ㄅ"
+            android:keyOutputText="ㄅ" />
+        <Key
+            android:codes="2"
+            android:keyLabel="ㄆ"
+            android:keyOutputText="ㄆ" />
+        <Key
+            android:codes="3"
+            android:keyLabel="ㄇ"
+            android:keyOutputText="ㄇ" />
+        <Key
+            android:codes="4"
+            android:keyLabel="ㄈ"
+            android:keyOutputText="ㄈ" />
+        <Key
+            android:codes="5"
+            android:keyLabel="ㄉ"
+            android:keyOutputText="ㄉ" />
+        <Key
+            android:codes="6"
+            android:keyLabel="ㄊ"
+            android:keyOutputText="ㄊ" />
+        <Key
+            android:codes="7"
+            android:keyLabel="ㄋ"
+            android:keyOutputText="ㄋ" />
+        <Key
+            android:codes="8"
+            android:keyLabel="ㄌ"
+            android:keyOutputText="ㄌ" />
+        <Key
+            android:codes="9"
+            android:keyLabel="ㄍ"
+            android:keyOutputText="ㄍ" />
+    </Row>
+
+    <Row>
+        <Key
+            android:codes="10"
+            android:keyLabel="ㄎ"
+            android:keyOutputText="ㄎ" />
+        <Key
+            android:codes="11"
+            android:keyLabel="ㄏ"
+            android:keyOutputText="ㄏ" />
+        <Key
+            android:codes="12"
+            android:keyLabel="ㄐ"
+            android:keyOutputText="ㄐ" />
+        <Key
+            android:codes="13"
+            android:keyLabel="ㄑ"
+            android:keyOutputText="ㄑ" />
+        <Key
+            android:codes="14"
+            android:keyLabel="ㄒ"
+            android:keyOutputText="ㄒ" />
+
+        <Key
+            android:codes="15"
+            android:keyLabel="ㄓ"
+            android:keyOutputText="ㄓ"
+            />
+
+        <Key
+            android:codes="16"
+            android:keyLabel="ㄔ"
+            android:keyOutputText="ㄔ" />
+        <Key
+            android:codes="17"
+            android:keyLabel="ㄕ"
+            android:keyOutputText="ㄕ" />
+        <Key
+            android:codes="18"
+            android:keyLabel="ㄖ"
+            android:keyOutputText="ㄖ" />
+        <Key
+            android:codes="19"
+            android:keyLabel="ㄗ"
+            android:keyOutputText="ㄗ" />
+    </Row>
+
+    <Row>
+        <Key
+            android:codes="20"
+            android:keyLabel="ㄘ"
+            android:keyOutputText="ㄘ" />
+        <Key
+            android:codes="21"
+            android:keyLabel="ㄙ"
+            android:keyOutputText="ㄙ" />
+        <Key
+            android:codes="22"
+            android:keyLabel="ㄧ"
+            android:keyOutputText="ㄧ" />
+        <Key
+            android:codes="23"
+            android:keyLabel="ㄨ"
+            android:keyOutputText="ㄨ" />
+        <Key
+            android:codes="24"
+            android:keyLabel="ㄩ"
+            android:keyOutputText="ㄩ" />
+        <Key
+            android:codes="25"
+            android:keyLabel="ㄚ"
+            android:keyOutputText="ㄚ" />
+        <Key
+            android:codes="26"
+            android:keyLabel="ㄛ"
+            android:keyOutputText="ㄛ" />
+        <Key
+            android:codes="27"
+            android:keyLabel="ㄜ"
+            android:keyOutputText="ㄜ" />
+        <Key
+            android:codes="28"
+            android:keyLabel="ㄝ"
+            android:keyOutputText="ㄝ" />
+    </Row>
+
+    <Row>
+        <Key
+            android:codes="29"
+            android:keyLabel="ㄞ"
+            android:keyOutputText="ㄞ" />
+        <Key
+            android:codes="30"
+            android:keyLabel="ㄟ"
+            android:keyOutputText="ㄟ" />
+        <Key
+            android:codes="31"
+            android:keyLabel="ㄠ"
+            android:keyOutputText="ㄠ" />
+        <Key
+            android:codes="32"
+            android:keyLabel="ㄡ"
+            android:keyOutputText="ㄡ" />
+        <Key
+            android:codes="33"
+            android:keyLabel="ㄢ"
+            android:keyOutputText="ㄢ" />
+        <Key
+            android:codes="34"
+            android:keyLabel="ㄣ"
+            android:keyOutputText="ㄣ" />
+        <Key
+            android:codes="35"
+            android:keyLabel="ㄤ"
+            android:keyOutputText="ㄤ" />
+        <Key
+            android:codes="36"
+            android:keyLabel="ㄥ"
+            android:keyOutputText="ㄥ" />
+        <Key
+            android:codes="37"
+            android:keyLabel="ㄦ"
+            android:keyOutputText="ㄦ" />
+    </Row>
+
+    <Row>
+        <Key
+            android:codes="-21"
+            android:keyLabel="退回" />
+        <Key
+            android:codes="-22"
+            android:keyLabel="清除" />
+    </Row>
+</Keyboard>

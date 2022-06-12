@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+<!--    <usb-device vendor-id="1137" />-->
+<!--    <usb-device vendor-id="1443" />-->
+    <usb-deivce subclass="0"/>
+    <usb-deivce subclass="7"/>
+    <usb-deivce subclass="14"/>
+    <usb-deivce subclass="2"/>
+</resources>

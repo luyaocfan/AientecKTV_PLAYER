@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_entrance"
+    app:startDestination="@id/qrcodeFragment">
+
+    <fragment
+        android:id="@+id/qrcodeFragment"
+        android:name="com.aientec.ktv_vod.fragment.QrCodeFragment"
+        android:label="QrcodeFragment" >
+        <action
+            android:id="@+id/action_qrcodeFragment_to_authorizationFragment"
+            app:destination="@id/authorizationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/authorizationFragment"
+        android:name="com.aientec.ktv_vod.fragment.AuthorizationFragment"
+        android:label="AuthorizationFragment" />
+</navigation>

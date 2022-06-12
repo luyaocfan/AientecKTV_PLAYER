@@ -1,0 +1,72 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.AientecKTV" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryVariant">@color/primaryLightColor</item>
+        <item name="colorOnPrimary">@color/primaryTextColor</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondaryColor</item>
+        <item name="colorSecondaryVariant">@color/secondaryLightColor</item>
+        <item name="colorOnSecondary">@color/secondaryTextColor</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/primaryColor</item>
+        <!-- Customize your theme here. -->
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@color/primaryColor</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="fullscreenBackgroundColor">@color/primaryColor</item>
+        <item name="fullscreenTextColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="Theme.TitleText" parent="Theme.AientecKTV">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Theme.SubTitleText" parent="Theme.AientecKTV">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+
+    <style name="Theme.WideItemTitleText" parent="Theme.AientecKTV">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+    <style name="Theme.WideItemDescriptionText" parent="Theme.AientecKTV">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/primaryLightColor</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+
+    <style name="Theme.SquareItemTitleText" parent="Theme.AientecKTV">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+    <style name="Theme.AientecKTV.FullscreenDialog" >
+<!--        <item name="android:windowNoTitle">true</item>-->
+<!--        <item name="android:windowFullscreen">false</item>-->
+<!--        <item name="android:windowIsFloating">false</item>-->
+        <item name="android:windowBackground">#90000000</item>
+    </style>
+
+    <style name="Theme.AientecKTV.Spinner" parent="Theme.AientecKTV">
+        <item name="spinnerDropDownItemStyle">@style/Theme.AientecKTV.Spinner.Item</item>
+        <item name="android:dropDownItemStyle">@style/Theme.AientecKTV.Spinner.Item</item>
+    </style>
+
+    <style name="Theme.AientecKTV.Spinner.Item" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="iconTint">@color/primaryTextColor</item>
+    </style>
+</resources>

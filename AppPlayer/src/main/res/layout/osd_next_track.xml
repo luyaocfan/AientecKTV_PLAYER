@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:background="#D00000ff"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:visibility="gone"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:minEms="10"
+        android:text="準備撥放歌曲"
+        android:textColor="#ffffff"
+        android:textSize="@dimen/osd_text_size"
+        app:autoSizeTextType="uniform" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4px"
+        android:background="#ffffff" />
+
+    <TextView
+        android:id="@+id/sn"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="53072"
+        android:textColor="#ffffff"
+        android:textSize="@dimen/osd_text_size"
+        app:autoSizeTextType="uniform" />
+
+    <TextView
+        android:id="@+id/singer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="盧廣仲"
+        android:textColor="#ffffff"
+        android:textSize="@dimen/osd_text_size"
+        app:autoSizeTextType="uniform" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="刻在我心底的名字"
+        android:textColor="#ffffff"
+        android:textSize="@dimen/osd_text_size"
+        app:autoSizeTextType="uniform" />
+</LinearLayout>

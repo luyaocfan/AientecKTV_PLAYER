@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- {@deprecated Copy this definition into your own application project.} -->
+    <declare-styleable name="OutlinedTextView">
+        <attr name="outlineColor" format="color"/>
+    </declare-styleable>
+
+</resources>

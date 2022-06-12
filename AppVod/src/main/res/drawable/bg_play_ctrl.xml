@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <size
+                android:width="@dimen/control_icon_size"
+                android:height="@dimen/control_icon_size" />
+            <solid android:color="@color/accentPurple" />
+        </shape>
+    </item>
+
+    <item
+        android:start="1dp"
+        android:top="1dp">
+        <shape android:shape="oval">
+            <size
+                android:width="@dimen/control_icon_size"
+                android:height="@dimen/control_icon_size" />
+            <gradient
+                android:angle="135"
+                android:endColor="#000000"
+                android:startColor="#9F9F9F" />
+        </shape>
+    </item>
+</layer-list>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:divider="@drawable/div_v"
+    android:orientation="horizontal"
+    android:showDividers="middle"
+    tools:ignore="PxUsage">
+
+    <LinearLayout
+        android:layout_width="730px"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="41px"
+            android:layout_marginStart="45px"
+            android:layout_marginTop="18px"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/back"
+                android:layout_width="41px"
+                android:layout_height="41px"
+                android:background="@null"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_search_back" />
+
+            <ImageButton
+                android:id="@+id/home"
+                android:layout_width="41px"
+                android:layout_height="41px"
+                android:layout_marginStart="4dp"
+                android:background="@null"
+                android:src="@drawable/ic_status_home"
+                app:tint="@color/colorWhite" />
+
+            <TextView
+                android:layout_width="41px"
+                android:layout_height="41px"
+                android:gravity="center"
+                android:text="/"
+                android:textStyle="bold"
+                app:autoSizeTextType="uniform" />
+
+            <TextView
+                android:id="@+id/page_name"
+                android:layout_width="match_parent"
+                android:layout_height="41px"
+                android:layout_marginStart="4dp"
+                android:gravity="start|center_vertical"
+                android:textColor="@color/accentPurple"
+                app:autoSizeTextType="uniform" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="50px"
+            android:orientation="vertical"
+            tools:ignore="PxUsage">
+
+            <ImageView
+                android:src="@drawable/singer_page_logo"
+                android:layout_width="match_parent"
+                android:layout_height="575px"
+                android:layout_marginStart="85px"
+                android:layout_marginEnd="69px" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@drawable/div_h"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:showDividers="middle">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="20px"
+                    android:layout_marginTop="25px"
+                    android:layout_marginBottom="20px"
+                    android:includeFontPadding="false"
+                    app:autoSizeTextType="uniform" />
+
+                <TextView
+                    android:text="歌名點歌"
+                    android:layout_width="wrap_content"
+                    android:layout_height="67px"
+                    android:layout_marginTop="13px"
+                    android:layout_marginBottom="40px"
+                    android:includeFontPadding="false"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:textColor="@color/colorWhite"
+                    app:autoSizeTextType="uniform" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingStart="15px"
+        android:paddingTop="103px" />
+
+</LinearLayout>

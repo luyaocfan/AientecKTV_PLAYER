@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/ad_area_width"
+    android:layout_height="match_parent"
+    android:layout_gravity="fill"
+    android:orientation="vertical">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingStart="53px"
+        android:paddingTop="43px"
+        android:paddingEnd="53px" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="84px">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/ind"
+            android:layout_width="match_parent"
+            android:layout_height="10px"
+            android:layout_gravity="center_vertical"
+            android:background="#00000000"
+            app:tabBackground="@drawable/ic_dot_indicator2"
+            app:tabGravity="center"
+            app:tabIndicator="@null"
+            app:tabMaxWidth="10px"
+            app:tabMode="scrollable"
+            app:tabPaddingEnd="16dp"
+            app:tabPaddingStart="16dp" />
+    </FrameLayout>
+
+</LinearLayout>

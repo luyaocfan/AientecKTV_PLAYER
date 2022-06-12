@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:maxHeight="155px"
+    android:orientation="horizontal"
+    tools:ignore="PxUsage"
+    tools:layout_height="155px">
+
+    <LinearLayout
+        android:id="@+id/display_layout"
+        android:layout_width="680px"
+        android:layout_height="match_parent"
+        android:divider="@drawable/div_v"
+        android:dividerPadding="45px"
+        android:orientation="horizontal"
+        android:showDividers="middle"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/empty_play_info"
+            android:layout_width="686px"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="無播放資訊"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/colorWhite"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/currant_display"
+            android:layout_width="390px"
+            android:layout_height="64px"
+            android:layout_marginTop="45px"
+            android:layout_marginBottom="46px"
+            android:orientation="horizontal"
+            android:paddingStart="46px"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/currant_track_img"
+                android:layout_width="@dimen/control_playing_icon_size"
+                android:layout_height="@dimen/control_playing_icon_size"
+                android:scaleType="fitXY"
+                android:src="@drawable/img_track_logo" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="15px"
+                android:orientation="vertical"
+                android:paddingTop="21px">
+
+
+                <TextView
+                    android:id="@+id/currant_track_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:includeFontPadding="false"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="21px"
+                    tools:text="123" />
+
+                <TextView
+                    android:id="@+id/currant_tack_album"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="16px"
+                    tools:text="345" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/prepare_display"
+            android:layout_width="296px"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/prepare_track_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/colorWhite"
+                android:textSize="21px"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="下一首"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textSize="15px"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/prepare_track_name" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="5"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:drawablePadding="@dimen/control_icon_padding"
+            android:gravity="center_horizontal"
+            android:tag="ACTION:CUT"
+            android:text="@string/label_cut"
+            android:textColor="@color/color_action_btn"
+            android:textSize="@dimen/control_text_size"
+            app:drawableTint="@color/color_action_btn"
+            app:drawableTopCompat="@drawable/ic_control_cut" />
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:tag="ACTION:PAUSE"
+            android:text="@string/label_pause"
+            android:textColor="@color/color_action_btn"
+            android:textSize="@dimen/control_text_size"
+            app:drawableTint="@color/color_action_btn"
+            app:drawableTopCompat="@drawable/ic_control_pause" />
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:tag="ACTION:VOCAL"
+            android:text="@string/label_vocal_original"
+            android:textColor="@color/color_action_btn"
+            android:textSize="@dimen/control_text_size"
+            app:drawableTint="@color/color_action_btn"
+            app:drawableTopCompat="@drawable/ic_control_pause" />
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:tag="ACTION:REPLAY"
+            android:text="@string/label_music_replay"
+            android:textColor="@color/color_action_btn"
+            android:textSize="@dimen/control_text_size"
+            app:drawableTint="@color/color_action_btn"
+            app:drawableTopCompat="@drawable/ic_control_replay" />
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:tag="ACTION:MUTE"
+            android:text="@string/label_music_mute"
+            android:textColor="@color/color_action_btn"
+            android:textSize="@dimen/control_text_size"
+            app:drawableTint="@color/color_action_btn"
+            app:drawableTopCompat="@drawable/ic_control_mute" />
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:tag="ACTION:SCORE"
+            android:text="@string/label_rate"
+            android:textColor="@color/color_action_btn"
+            android:textSize="@dimen/control_text_size"
+            app:drawableTint="@color/color_action_btn"
+            app:drawableTopCompat="@drawable/ic_control_rate" />
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:tag="ACTION:QRCODE"
+            android:text="@string/label_app_link"
+            android:textColor="@color/color_action_btn"
+            android:textSize="@dimen/control_text_size"
+            app:drawableTint="@color/color_action_btn"
+            app:drawableTopCompat="@drawable/ic_control_link" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:paddingTop="12px">
+
+            <ImageButton
+                android:id="@+id/mic_volume_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:background="@null"
+                android:src="@drawable/ic_control_volume_down"
+                android:tag="ACTION:MIC_DEC"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/color_action_btn" />
+
+            <ToggleButton
+                android:id="@+id/mic_volume_control"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:adjustViewBounds="true"
+                android:background="@drawable/ic_control_mic"
+                android:backgroundTint="@color/color_action_radio"
+                android:drawablePadding="0dp"
+                android:minWidth="@dimen/control_icon_size"
+                android:minHeight="@dimen/control_icon_size"
+                android:tag="ACTION:MIC_CONTROL"
+                android:textSize="0sp"
+                app:layout_constraintStart_toEndOf="@id/mic_volume_down"
+                app:layout_constraintTop_toTopOf="@id/mic_volume_down" />
+
+            <ImageButton
+                app:tint="@color/color_action_btn"
+                android:id="@+id/mic_volume_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:adjustViewBounds="true"
+                android:background="@null"
+                android:src="@drawable/ic_control_volume_up"
+                android:tag="ACTION:MIC_ADD"
+                app:layout_constraintStart_toEndOf="@id/mic_volume_control"
+                app:layout_constraintTop_toTopOf="@id/mic_volume_down" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/label_microphone"
+                android:textColor="@color/colorWhite"
+                android:textSize="@dimen/control_text_size"
+                app:layout_constraintEnd_toEndOf="@id/mic_volume_up"
+                app:layout_constraintStart_toStartOf="@id/mic_volume_down"
+                app:layout_constraintTop_toBottomOf="@id/mic_volume_control" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:paddingTop="12px">
+
+            <ImageButton
+                app:tint="@color/color_action_btn"
+                android:id="@+id/music_volume_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:background="@null"
+                android:src="@drawable/ic_control_volume_down"
+                android:tag="ACTION:MUSIC_DEC"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ToggleButton
+                android:id="@+id/music_volume_control"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:adjustViewBounds="true"
+                android:background="@drawable/ic_control_music_volume"
+                android:backgroundTint="@color/color_action_radio"
+                android:drawablePadding="0dp"
+                android:minWidth="@dimen/control_icon_size"
+                android:minHeight="@dimen/control_icon_size"
+                android:tag="ACTION:MUSIC_CONTROL"
+                android:textSize="0sp"
+                app:layout_constraintStart_toEndOf="@id/music_volume_down"
+                app:layout_constraintTop_toTopOf="@id/music_volume_down" />
+
+            <ImageButton
+                app:tint="@color/color_action_btn"
+                android:id="@+id/music_volume_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:adjustViewBounds="true"
+                android:background="@null"
+                android:src="@drawable/ic_control_volume_up"
+                android:tag="ACTION:MUSIC_ADD"
+                app:layout_constraintStart_toEndOf="@id/music_volume_control"
+                app:layout_constraintTop_toTopOf="@id/music_volume_down" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/label_music_volume"
+                android:textColor="@color/colorWhite"
+                android:textSize="@dimen/control_text_size"
+                app:layout_constraintEnd_toEndOf="@id/music_volume_up"
+                app:layout_constraintStart_toStartOf="@id/music_volume_down"
+                app:layout_constraintTop_toBottomOf="@id/music_volume_control" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <CheckBox
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:button="@null"
+            android:drawablePadding="4dp"
+            android:gravity="center_horizontal"
+            android:paddingTop="12px"
+            android:tag="ACTION:SETTING"
+            android:text="@string/label_setting"
+            android:textColor="@color/color_action_radio"
+            android:textSize="@dimen/control_text_size"
+            app:drawableTint="@color/color_action_radio"
+            app:drawableTopCompat="@drawable/ic_control_setting" />
+    </LinearLayout>
+
+
+</LinearLayout>

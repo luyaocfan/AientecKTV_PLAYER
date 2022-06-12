@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:divider="@drawable/div_v"
+    android:orientation="horizontal"
+    android:showDividers="middle">
+
+    <LinearLayout
+        android:layout_width="@dimen/ad_area_width"
+        android:layout_height="match_parent"
+        android:layout_marginTop="72px"
+        android:orientation="vertical"
+        android:padding="24px">
+
+        <TextView
+            android:id="@+id/input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_dev"
+            android:gravity="center"
+            android:padding="14px"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/colorWhite" />
+
+        <RadioGroup
+            android:id="@+id/key_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/key_type_1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/key_type_1" />
+
+            <RadioButton
+                android:id="@+id/key_type_2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/key_type_2" />
+
+            <RadioButton
+                android:id="@+id/key_type_3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/key_type_3" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="2" />
+        </RadioGroup>
+
+        <com.aientec.ktv_vod.view.KeyboardView
+            android:id="@+id/keyboard"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <RadioGroup
+            android:id="@+id/search_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25px"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/search_type_male"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/ic_search_type_male"
+                android:gravity="center_horizontal"
+                android:tag="1"
+                android:text="@string/label_searching_type_1" />
+
+            <RadioButton
+                android:id="@+id/search_type_female"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/ic_search_type_female"
+                android:gravity="center_horizontal"
+                android:tag="2"
+                android:text="@string/label_searching_type_2" />
+
+            <RadioButton
+                android:id="@+id/search_type_group"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/ic_search_type_group"
+                android:gravity="center_horizontal"
+                android:tag="3"
+                android:text="@string/label_searching_type_3" />
+
+            <RadioButton
+                android:id="@+id/search_type_track"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/ic_search_type_track"
+                android:gravity="center_horizontal"
+                android:tag="4"
+                android:text="@string/label_searching_type_4" />
+        </RadioGroup>
+    </LinearLayout>
+
+
+    <fragment
+        android:id="@+id/nav_fragment_search"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        app:navGraph="@navigation/nav_search"
+        tools:layout="@layout/fragment_main_home_menu" />
+</LinearLayout>

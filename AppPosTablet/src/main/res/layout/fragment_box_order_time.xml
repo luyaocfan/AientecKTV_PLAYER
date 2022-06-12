@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/label_time_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_time_duration"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="36sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/min"
+        style="@android:style/ThemeOverlay.Material.Dark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="3"
+        android:gravity="center"
+        android:imeOptions="actionDone"
+        android:inputType="number"
+        android:maxLines="1"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toBottomOf="@id/label_time_duration"
+        app:layout_constraintStart_toEndOf="@id/label_time_duration"
+        app:layout_constraintTop_toTopOf="@id/label_time_duration" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_min"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toBottomOf="@id/label_time_duration"
+        app:layout_constraintStart_toEndOf="@id/min"
+        app:layout_constraintTop_toTopOf="@id/label_time_duration" />
+
+    <GridLayout
+        android:id="@+id/layout_time"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:columnCount="4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_time_duration">
+
+        <Button
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:tag="30"
+            android:text="@string/label_30_min"
+            android:textSize="24sp" />
+
+        <Button
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:tag="60"
+            android:text="@string/label_1_hr"
+            android:textSize="24sp" />
+
+        <Button
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:tag="120"
+            android:text="@string/label_2_hr"
+            android:textSize="24sp" />
+
+        <Button
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:tag="180"
+            android:text="@string/label_3_hr"
+            android:textSize="24sp" />
+
+        <Button
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:tag="240"
+            android:text="@string/label_4_hr"
+            android:textSize="24sp" />
+
+        <Button
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:tag="300"
+            android:text="@string/label_5_hr"
+            android:textSize="24sp" />
+
+        <Button
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:tag="360"
+            android:text="@string/label_6_hr"
+            android:textSize="24sp" />
+
+        <Button
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:tag="420"
+            android:text="@string/label_7_hr"
+            android:textSize="24sp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:gravity="center"
+            android:tag="-1"
+            android:text="@string/label_no_limit"
+            android:textSize="24sp" />
+
+        <Button
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:gravity="center"
+            android:tag="0"
+            android:text="@string/label_clean"
+            android:textSize="24sp" />
+    </GridLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

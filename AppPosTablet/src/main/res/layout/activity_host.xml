@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="?attr/fullscreenBackgroundColor"
+    app:layoutDescription="@xml/activity_host_scene"
+    tools:context=".activity.HostActivity"
+    tools:ignore="ContentDescription">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/deepBlue">
+
+            <ImageButton
+                android:id="@+id/home"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@null"
+                android:src="@drawable/ic_menu"
+                app:tint="@color/primaryTextColor" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/title"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="24sp" />
+
+            <View
+                android:layout_width="400dp"
+                android:layout_height="0dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@drawable/actionbar_divider"
+                android:dividerPadding="8dp"
+                android:gravity="center_vertical"
+                android:layoutDirection="rtl"
+                android:orientation="horizontal"
+                android:showDividers="middle|end">
+
+                <TextView
+                    android:id="@+id/username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@null"
+                    android:ems="6"
+                    android:gravity="center"
+                    android:src="@drawable/ic_printer"
+                    android:text="撒BEER"
+                    android:textColor="@color/primaryTextColor"
+                    android:textSize="24sp"
+                    android:tint="@color/primaryTextColor"
+                    app:drawableEndCompat="@drawable/ic_user"
+                    app:drawableStartCompat="@drawable/ic_drop_down"
+                    app:drawableTint="@color/primaryTextColor" />
+
+                <TextClock
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@null"
+                    android:drawableEnd="@drawable/ic_network"
+                    android:drawablePadding="16dp"
+                    android:drawableTint="@color/primaryTextColor"
+                    android:format12Hour="HH:mm"
+                    android:format24Hour="HH:mm"
+                    android:src="@drawable/ic_printer"
+                    android:textColor="@color/primaryTextColor"
+                    android:textSize="24sp"
+                    android:tint="@color/primaryTextColor" />
+
+                <ImageButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:src="@drawable/ic_notification"
+                    app:tint="@color/primaryTextColor" />
+
+                <ImageButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:src="@drawable/ic_connection"
+                    app:tint="@color/primaryTextColor" />
+
+                <ImageButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:src="@drawable/ic_printer"
+                    app:tint="@color/primaryTextColor" />
+            </LinearLayout>
+        </com.google.android.material.appbar.MaterialToolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <include
+        android:id="@+id/navigation_list"
+        layout="@layout/content_navigation_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/nav_host_fragment_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_layout" />
+
+    <fragment
+        android:id="@+id/nav_fragment_host"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/navigation_list"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_layout"
+        app:navGraph="@navigation/nav_host" />
+</androidx.constraintlayout.motion.widget.MotionLayout>
