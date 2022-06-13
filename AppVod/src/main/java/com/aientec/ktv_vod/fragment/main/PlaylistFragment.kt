@@ -188,6 +188,7 @@ class PlaylistFragment : Fragment() {
 
                   init {
                         itemView.setOnClickListener { onItemClick(itemView, track!!) }
+
                   }
             }
 

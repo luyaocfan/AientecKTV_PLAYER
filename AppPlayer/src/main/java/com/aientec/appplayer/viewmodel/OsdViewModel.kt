@@ -40,11 +40,11 @@ class OsdViewModel : ViewModelImpl() {
             }
 
             override fun onEffectVolumeChanged(value: Int) {
-                notifyMassage.postValue("特效音量 : $value")
+                notifyMassage.postValue("回音音量 : $value")
             }
 
             override fun onToneChanged(value: Int) {
-                notifyMassage.postValue("回音 : $value")
+                notifyMassage.postValue("音調 : ${value-7}")
             }
         })
     }

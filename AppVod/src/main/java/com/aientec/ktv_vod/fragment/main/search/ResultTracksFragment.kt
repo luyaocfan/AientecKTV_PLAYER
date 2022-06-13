@@ -1,5 +1,6 @@
 package com.aientec.ktv_vod.fragment.main.search
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -55,6 +56,10 @@ class ResultTracksFragment : Fragment() {
             searchViewModel.trackResults.observe(viewLifecycleOwner) {
                   itemAdapter.list = it
             }
+
+            trackViewModel.playingTracks.observe(viewLifecycleOwner) {
+                  itemAdapter.compareList = it
+            }
       }
 
       private fun showPopup(parent: View) {
@@ -92,35 +97,15 @@ class ResultTracksFragment : Fragment() {
             }
       }
 
-      private inner class ItemViewHolder(private val mBinding: ItemTrackBinding) :
-            RecyclerView.ViewHolder(mBinding.root) {
-            var track: Track? = null
+
+      private inner class ItemAdapter : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
+            var list: List<Track>? = null
                   set(value) {
                         field = value
-                        if (field != null) {
-                              mBinding.name.text = field!!.name
-                              mBinding.performer.text = field!!.performer
-                        }
+                        notifyDataSetChanged()
                   }
 
-            init {
-                  itemView.setOnClickListener {
-                        trackViewModel.onTrackSelected(track)
-                        showPopup(it)
-                  }
-                  mBinding.order.setOnClickListener {
-                        trackViewModel.onTrackSelected(track)
-                        trackViewModel.onOrderTrack()
-                  }
-                  mBinding.insert.setOnClickListener {
-                        trackViewModel.onTrackSelected(track)
-                        trackViewModel.onInsertTrack()
-                  }
-            }
-      }
-
-      private inner class ItemAdapter : RecyclerView.Adapter<ItemViewHolder>() {
-            var list: List<Track>? = null
+            var compareList: List<Track>? = null
                   set(value) {
                         field = value
                         notifyDataSetChanged()
@@ -137,5 +122,42 @@ class ResultTracksFragment : Fragment() {
             override fun getItemCount(): Int {
                   return list?.size ?: 0
             }
+
+            private inner class ItemViewHolder(private val mBinding: ItemTrackBinding) :
+                  RecyclerView.ViewHolder(mBinding.root) {
+                  var track: Track? = null
+                        set(value) {
+                              field = value
+                              if (field != null) {
+                                    mBinding.name.text = field!!.name
+                                    mBinding.performer.text = field!!.performer
+
+                                    val color: Int =
+                                          if (compareList?.contains(field) == true) resources.getColor(
+                                                R.color.accentPurple,
+                                                null
+                                          ) else Color.WHITE
+
+                                    mBinding.name.setTextColor(color)
+                                    mBinding.performer.setTextColor(color)
+                              }
+                        }
+
+                  init {
+                        itemView.setOnClickListener {
+                              trackViewModel.onTrackSelected(track)
+                              showPopup(it)
+                        }
+                        mBinding.order.setOnClickListener {
+                              trackViewModel.onTrackSelected(track)
+                              trackViewModel.onOrderTrack()
+                        }
+                        mBinding.insert.setOnClickListener {
+                              trackViewModel.onTrackSelected(track)
+                              trackViewModel.onInsertTrack()
+                        }
+                  }
+            }
+
       }
 }

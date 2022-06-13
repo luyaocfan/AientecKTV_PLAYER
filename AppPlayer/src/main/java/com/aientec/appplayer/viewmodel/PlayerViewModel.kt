@@ -71,6 +71,12 @@ class PlayerViewModel : ViewModelImpl() {
             }
       }
 
+      fun onOpen(){
+            viewModelScope.launch {
+                  repository.nextSongRequest()
+            }
+      }
+
 
       fun onPlaying() {
             viewModelScope.launch {

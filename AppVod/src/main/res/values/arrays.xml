@@ -11,12 +11,10 @@
     </string-array>
 
     <string-array name="mic_mode">
-        <item>麥克風模式</item>
-        <item>模式 1</item>
-        <item>模式 2</item>
-        <item>模式 3</item>
-        <item>模式 4</item>
-        <item>模式 5</item>
+        <item>專業歌手</item>
+        <item>唱將</item>
+        <item>KTV</item>
+        <item>演唱會</item>
     </string-array>
 
     <string-array name="light_modes">

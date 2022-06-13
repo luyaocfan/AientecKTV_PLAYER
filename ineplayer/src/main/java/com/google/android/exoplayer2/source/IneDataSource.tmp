@@ -67,7 +67,7 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
         }
 
         @Override
-        public final Factory setDefaultRequestProperties(Map<String, String> defaultRequestProperties) {
+        public final IneDataSource.Factory setDefaultRequestProperties(Map<String, String> defaultRequestProperties) {
             this.defaultRequestProperties.clearAndSet(defaultRequestProperties);
             return this;
         }
@@ -82,7 +82,7 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
          *     agent of the underlying platform.
          * @return This factory.
          */
-        public Factory setUserAgent(@Nullable String userAgent) {
+        public IneDataSource.Factory setUserAgent(@Nullable String userAgent) {
             this.userAgent = userAgent;
             return this;
         }
@@ -95,7 +95,7 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
          * @param connectTimeoutMs The connect timeout, in milliseconds, that will be used.
          * @return This factory.
          */
-        public Factory setConnectTimeoutMs(int connectTimeoutMs) {
+        public IneDataSource.Factory setConnectTimeoutMs(int connectTimeoutMs) {
             this.connectTimeoutMs = connectTimeoutMs;
             return this;
         }
@@ -108,7 +108,7 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
          * @param readTimeoutMs The connect timeout, in milliseconds, that will be used.
          * @return This factory.
          */
-        public Factory setReadTimeoutMs(int readTimeoutMs) {
+        public IneDataSource.Factory setReadTimeoutMs(int readTimeoutMs) {
             this.readTimeoutMs = readTimeoutMs;
             return this;
         }
@@ -121,14 +121,14 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
          * @param allowCrossProtocolRedirects Whether to allow cross protocol redirects.
          * @return This factory.
          */
-        public Factory setAllowCrossProtocolRedirects(boolean allowCrossProtocolRedirects) {
+        public IneDataSource.Factory setAllowCrossProtocolRedirects(boolean allowCrossProtocolRedirects) {
             this.allowCrossProtocolRedirects = allowCrossProtocolRedirects;
             return this;
         }
 
         /**
          * Sets a content type {@link Predicate}. If a content type is rejected by the predicate then a
-         * {@link InvalidContentTypeException} is thrown from {@link
+         * {@link HttpDataSource.InvalidContentTypeException} is thrown from {@link
          * IneDataSource#open(DataSpec)}.
          *
          * <p>The default is {@code null}.
@@ -137,7 +137,7 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
          *     predicate that was previously set.
          * @return This factory.
          */
-        public Factory setContentTypePredicate(@Nullable Predicate<String> contentTypePredicate) {
+        public IneDataSource.Factory setContentTypePredicate(@Nullable Predicate<String> contentTypePredicate) {
             this.contentTypePredicate = contentTypePredicate;
             return this;
         }
@@ -152,7 +152,7 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
          * @param transferListener The listener that will be used.
          * @return This factory.
          */
-        public Factory setTransferListener(@Nullable TransferListener transferListener) {
+        public IneDataSource.Factory setTransferListener(@Nullable TransferListener transferListener) {
             this.transferListener = transferListener;
             return this;
         }
@@ -173,12 +173,7 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
             return dataSource;
         }
     }
-    public static final int ERRORTYPE_OPEN = 0;
-    public static final int ERRORTYPE_CACHEOPEN = 1;
-    public static final int ERRORTYPE_READ = 2;
-    public interface Listener{
-        public void OnIneDataSourceError(int errorType, String url, String message);
-    };
+
     /** The default connection timeout, in milliseconds. */
     public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 8 * 1000;
     /**
@@ -207,7 +202,7 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
     private boolean opened;
     private int responseCode, cacheResponseCode;
     private HashMap<String, List<String>> cacheResponseHeaders = null;
-    public Listener listener = null;
+
     private long bytesToRead;
     private long bytesRead;
     private long cacheBytesToRead;
@@ -227,21 +222,21 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
     public static int VODServerIndex = 0;
     public static final String VODReplaceSign = "http://vodserver.ine.com/";
     public Uri uri;
-    /** @deprecated Use {@link Factory} instead. */
+    /** @deprecated Use {@link IneDataSource.Factory} instead. */
     @SuppressWarnings("deprecation")
     @Deprecated
     public IneDataSource() {
         this(/* userAgent= */ null, DEFAULT_CONNECT_TIMEOUT_MILLIS, DEFAULT_READ_TIMEOUT_MILLIS);
     }
 
-    /** @deprecated Use {@link Factory} instead. */
+    /** @deprecated Use {@link IneDataSource.Factory} instead. */
     @SuppressWarnings("deprecation")
     @Deprecated
     public IneDataSource(@Nullable String userAgent) {
         this(userAgent, DEFAULT_CONNECT_TIMEOUT_MILLIS, DEFAULT_READ_TIMEOUT_MILLIS);
     }
 
-    /** @deprecated Use {@link Factory} instead. */
+    /** @deprecated Use {@link IneDataSource.Factory} instead. */
     @SuppressWarnings("deprecation")
     @Deprecated
     public IneDataSource(
@@ -254,7 +249,7 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
                 /* defaultRequestProperties= */ null);
     }
 
-    /** @deprecated Use {@link Factory} instead. */
+    /** @deprecated Use {@link IneDataSource.Factory} instead. */
     @Deprecated
     public IneDataSource(
             @Nullable String userAgent,
@@ -289,7 +284,7 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
     }
 
     /**
-     * @deprecated Use {@link Factory#setContentTypePredicate(Predicate)}
+     * @deprecated Use {@link IneDataSource.Factory#setContentTypePredicate(Predicate)}
      *     instead.
      */
     @Deprecated
@@ -369,24 +364,16 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
         transferInitializing(dataSpec);
         Log.d("IneDataSource", "open:"+dataSpec.uri.toString()+" Pos:"+dataSpec.position+" Len:"+dataSpec.length+ " cached:"+bufferFillBytes);
         try {
+
             connection = makeConnection(tmpDataSpec);
-            Log.d("IneDataSource", "open success:"+connection.getURL().toString());
-        } catch (Exception e) {
+        } catch (IOException e) {
             @Nullable String message = e.getMessage();
-            if(e instanceof IOException) {
-                IOException ioe = (IOException) e;
-                if (message != null
-                        && Ascii.toLowerCase(message).matches("cleartext http traffic.*not permitted.*")) {
-                    throw new CleartextNotPermittedException(ioe, dataSpec);
-                }
-                throw new HttpDataSourceException(
-                        "Unable to connect", ioe, dataSpec, HttpDataSourceException.TYPE_OPEN);
+            if (message != null
+                    && Ascii.toLowerCase(message).matches("cleartext http traffic.*not permitted.*")) {
+                throw new CleartextNotPermittedException(e, dataSpec);
             }
-            Log.d(TAG,"open error:" + connection.getURL().toString() + " " + message);
-            e.printStackTrace();
-            if(listener != null) {
-                listener.OnIneDataSourceError(ERRORTYPE_OPEN, connection.getURL().toString(), e.getMessage());
-            }
+            throw new HttpDataSourceException(
+                    "Unable to connect", e, dataSpec, HttpDataSourceException.TYPE_OPEN);
         }
 
         HttpURLConnection connection = this.connection;
@@ -536,23 +523,14 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
         Log.d("IneDataSource", "cacheopen:"+dataSpec.uri.toString());
         try {
             cacheConnection = makeConnection(dataSpec);
-            Log.d("IneDataSource", "cacheBuffer open success:"+cacheConnection.getURL().toString());
-        } catch (Exception e) {
+        } catch (IOException e) {
             @Nullable String message = e.getMessage();
-            if(e instanceof IOException) {
-                IOException ioe = (IOException) e;
-                if (message != null
-                        && Ascii.toLowerCase(message).matches("cleartext http traffic.*not permitted.*")) {
-                    throw new CleartextNotPermittedException(ioe, dataSpec);
-                }
-                throw new HttpDataSourceException(
-                        "Unable to connect", ioe, dataSpec, HttpDataSourceException.TYPE_OPEN);
+            if (message != null
+                    && Ascii.toLowerCase(message).matches("cleartext http traffic.*not permitted.*")) {
+                throw new CleartextNotPermittedException(e, dataSpec);
             }
-            Log.e(TAG,"cacheBuffer error:" + cacheConnection.getURL().toString() + " " + message);
-            e.printStackTrace();
-            if(listener != null) {
-                listener.OnIneDataSourceError(ERRORTYPE_CACHEOPEN, cacheConnection.getURL().toString(), e.getMessage());
-            }
+            throw new HttpDataSourceException(
+                    "Unable to connect", e, dataSpec, HttpDataSourceException.TYPE_OPEN);
         }
         HttpURLConnection connection = cacheConnection;
         String responseMessage;
@@ -670,11 +648,6 @@ public class IneDataSource extends BaseDataSource implements HttpDataSource {
         try {
             return readInternal(buffer, offset, readLength);
         } catch (IOException e) {
-            Log.e(TAG, "read error:"+dataSpec.uri.toString()+" "+e.getMessage());
-            e.printStackTrace();
-            if(listener != null) {
-                listener.OnIneDataSourceError(ERRORTYPE_READ, dataSpec.uri.toString(), e.getMessage());
-            }
             throw new HttpDataSourceException(
                     e, castNonNull(dataSpec), HttpDataSourceException.TYPE_READ);
         }

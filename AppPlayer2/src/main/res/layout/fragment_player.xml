@@ -5,12 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <SurfaceView
+    <TextureView
         android:id="@+id/display"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <TextView
+        android:visibility="gone"
         android:id="@+id/log"
         android:layout_width="0dp"
         android:layout_height="0dp"

@@ -42,7 +42,7 @@ public class IneStereoVolumeProcessor implements AudioProcessor {
     }
 
     @Override
-    public AudioFormat configure(AudioFormat inputAudioFormat) throws AudioProcessor.UnhandledAudioFormatException {
+    public AudioFormat configure(AudioFormat inputAudioFormat) throws UnhandledAudioFormatException {
         //int sampleRateHz, int channelCount, @C.Encoding int encoding)
 
 

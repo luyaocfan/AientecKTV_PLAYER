@@ -26,7 +26,7 @@ import static com.google.android.exoplayer2.util.Assertions.checkNotNull;
 public final class IneMediaSource extends BaseMediaSource
         implements ProgressiveMediaPeriod.Listener {
 
-    /** Factory for {@link com.google.android.exoplayer2.source.IneMediaSource}s. */
+    /** Factory for {@link IneMediaSource}s. */
     public static final class Factory implements MediaSourceFactory {
 
         private final IneDataSource.Factory dataSourceFactory;
@@ -42,7 +42,7 @@ public final class IneMediaSource extends BaseMediaSource
         @Nullable private Object tag;
 
         /**
-         * Creates a new factory for {@link com.google.android.exoplayer2.source.IneMediaSource}s, using the extractors provided by
+         * Creates a new factory for {@link IneMediaSource}s, using the extractors provided by
          * {@link DefaultExtractorsFactory}.
          *
          * @param dataSourceFactory A factory for {@link DataSource}s to read the media.
@@ -51,7 +51,7 @@ public final class IneMediaSource extends BaseMediaSource
             this(dataSourceFactory, new DefaultExtractorsFactory(),null);
         }
         /**
-         * Creates a new factory for {@link com.google.android.exoplayer2.source.IneMediaSource}s, using the extractors provided by
+         * Creates a new factory for {@link IneMediaSource}s, using the extractors provided by
          * {@link DefaultExtractorsFactory}.
          *
          * @param dataSourceFactory A factory for {@link DataSource}s to read the media.
@@ -72,7 +72,7 @@ public final class IneMediaSource extends BaseMediaSource
         }
 
         /**
-         * Creates a new factory for {@link com.google.android.exoplayer2.source.IneMediaSource}s.
+         * Creates a new factory for {@link IneMediaSource}s.
          *
          * @param dataSourceFactory A factory for {@link IneDataSource}s to read the media.
          * @param progressiveMediaExtractorFactory A factory for the {@link ProgressiveMediaExtractor}
@@ -96,7 +96,7 @@ public final class IneMediaSource extends BaseMediaSource
          *     factory as unused.
          */
         @Deprecated
-        public com.google.android.exoplayer2.source.IneMediaSource.Factory setExtractorsFactory(@Nullable ExtractorsFactory extractorsFactory) {
+        public Factory setExtractorsFactory(@Nullable ExtractorsFactory extractorsFactory) {
             this.progressiveMediaExtractorFactory =
                     () ->
                             new BundledExtractorsAdapter(
@@ -109,7 +109,7 @@ public final class IneMediaSource extends BaseMediaSource
          *     #createMediaSource(MediaItem)} instead.
          */
         @Deprecated
-        public com.google.android.exoplayer2.source.IneMediaSource.Factory setCustomCacheKey(@Nullable String customCacheKey) {
+        public Factory setCustomCacheKey(@Nullable String customCacheKey) {
             this.customCacheKey = customCacheKey;
             return this;
         }
@@ -119,7 +119,7 @@ public final class IneMediaSource extends BaseMediaSource
          *     #createMediaSource(MediaItem)} instead.
          */
         @Deprecated
-        public com.google.android.exoplayer2.source.IneMediaSource.Factory setTag(@Nullable Object tag) {
+        public Factory setTag(@Nullable Object tag) {
             this.tag = tag;
             return this;
         }
@@ -131,7 +131,7 @@ public final class IneMediaSource extends BaseMediaSource
          * @param loadErrorHandlingPolicy A {@link LoadErrorHandlingPolicy}.
          * @return This factory, for convenience.
          */
-        public com.google.android.exoplayer2.source.IneMediaSource.Factory setLoadErrorHandlingPolicy(
+        public Factory setLoadErrorHandlingPolicy(
                 @Nullable LoadErrorHandlingPolicy loadErrorHandlingPolicy) {
             this.loadErrorHandlingPolicy =
                     loadErrorHandlingPolicy != null
@@ -150,13 +150,13 @@ public final class IneMediaSource extends BaseMediaSource
          *     MediaPeriod.Callback#onContinueLoadingRequested(SequenceableLoader)}.
          * @return This factory, for convenience.
          */
-        public com.google.android.exoplayer2.source.IneMediaSource.Factory setContinueLoadingCheckIntervalBytes(int continueLoadingCheckIntervalBytes) {
+        public Factory setContinueLoadingCheckIntervalBytes(int continueLoadingCheckIntervalBytes) {
             this.continueLoadingCheckIntervalBytes = continueLoadingCheckIntervalBytes;
             return this;
         }
 
         @Override
-        public com.google.android.exoplayer2.source.IneMediaSource.Factory setDrmSessionManagerProvider(
+        public Factory setDrmSessionManagerProvider(
                 @Nullable DrmSessionManagerProvider drmSessionManagerProvider) {
             if (drmSessionManagerProvider != null) {
                 this.drmSessionManagerProvider = drmSessionManagerProvider;
@@ -168,7 +168,7 @@ public final class IneMediaSource extends BaseMediaSource
             return this;
         }
 
-        public com.google.android.exoplayer2.source.IneMediaSource.Factory setDrmSessionManager(@Nullable DrmSessionManager drmSessionManager) {
+        public Factory setDrmSessionManager(@Nullable DrmSessionManager drmSessionManager) {
             if (drmSessionManager == null) {
                 setDrmSessionManagerProvider(null);
             } else {
@@ -178,7 +178,7 @@ public final class IneMediaSource extends BaseMediaSource
         }
 
         @Override
-        public com.google.android.exoplayer2.source.IneMediaSource.Factory setDrmHttpDataSourceFactory(
+        public Factory setDrmHttpDataSourceFactory(
                 @Nullable HttpDataSource.Factory drmHttpDataSourceFactory) {
             if (!usingCustomDrmSessionManagerProvider) {
                 ((DefaultDrmSessionManagerProvider) drmSessionManagerProvider)
@@ -188,7 +188,7 @@ public final class IneMediaSource extends BaseMediaSource
         }
 
         @Override
-        public com.google.android.exoplayer2.source.IneMediaSource.Factory setDrmUserAgent(@Nullable String userAgent) {
+        public Factory setDrmUserAgent(@Nullable String userAgent) {
             if (!usingCustomDrmSessionManagerProvider) {
                 ((DefaultDrmSessionManagerProvider) drmSessionManagerProvider).setDrmUserAgent(userAgent);
             }
@@ -199,19 +199,19 @@ public final class IneMediaSource extends BaseMediaSource
         @SuppressWarnings("deprecation")
         @Deprecated
         @Override
-        public com.google.android.exoplayer2.source.IneMediaSource createMediaSource(Uri uri) {
+        public IneMediaSource createMediaSource(Uri uri) {
             return createMediaSource(new MediaItem.Builder().setUri(uri).build());
         }
 
         /**
-         * Returns a new {@link com.google.android.exoplayer2.source.IneMediaSource} using the current parameters.
+         * Returns a new {@link IneMediaSource} using the current parameters.
          *
          * @param mediaItem The {@link MediaItem}.
-         * @return The new {@link com.google.android.exoplayer2.source.IneMediaSource}.
+         * @return The new {@link IneMediaSource}.
          * @throws NullPointerException if {@link MediaItem#playbackProperties} is {@code null}.
          */
         @Override
-        public com.google.android.exoplayer2.source.IneMediaSource createMediaSource(MediaItem mediaItem) {
+        public IneMediaSource createMediaSource(MediaItem mediaItem) {
             checkNotNull(mediaItem.playbackProperties);
             boolean needsTag = mediaItem.playbackProperties.tag == null && tag != null;
             boolean needsCustomCacheKey =
@@ -223,7 +223,7 @@ public final class IneMediaSource extends BaseMediaSource
             } else if (needsCustomCacheKey) {
                 mediaItem = mediaItem.buildUpon().setCustomCacheKey(customCacheKey).build();
             }
-            return new com.google.android.exoplayer2.source.IneMediaSource(
+            return new IneMediaSource(
                     mediaItem,
                     dataSourceFactory,
                     progressiveMediaExtractorFactory,

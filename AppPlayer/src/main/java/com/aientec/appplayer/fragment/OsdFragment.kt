@@ -138,7 +138,7 @@ class OsdFragment : Fragment() {
                         OSDBarrageItem(
                               "${messageBundle.sender} : ${messageBundle.data as String}",
                               OSDBarrageItem.Direction.RIGHT_TO_LEFT,
-                              1.2f,
+                              2.0f,
                               Color.WHITE,
                               false,
                               20000L,

@@ -183,6 +183,10 @@ abstract class DSData {
 
             mBuffer!!.get(data)
 
+            mBuffer!!.clear()
+
+            mBuffer = null
+
             return data
       }
 

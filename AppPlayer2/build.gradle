@@ -40,25 +40,25 @@ android {
             flavorDimensions 'model'
             buildConfigField 'String', 'MTV_URL', "\"http://192.168.77.210/mtv/%s\""
             buildConfigField 'String', 'DS_SEVER', "\"10.10.10.1:40051\""
-            buildConfigField 'String', 'FILE_ROOT', "\"http://202.39.38.71:10001/\""
-            buildConfigField 'String', 'IMG_ROOT', "\"http://202.39.38.71:10004/\""
-            buildConfigField 'String', 'PORTAL_SERVER', "\"http://202.39.38.71:10002/index.php/API/\""
+            buildConfigField 'String', 'FILE_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'PORTAL_SERVER', "\"http://192.168.77.200:10002/index.php/\""
         }
         Aien {
             flavorDimensions 'model'
-            buildConfigField 'String', 'MTV_URL', "\"http://192.168.77.202/mtv/%s\""
+            buildConfigField 'String', 'MTV_URL', "\"http://192.168.77.210/mtv/%s\""
             buildConfigField 'String', 'DS_SEVER', "\"10.10.10.1:40051\""
-            buildConfigField 'String', 'FILE_ROOT', "\"http://106.104.151.145:10001/\""
-            buildConfigField 'String', 'IMG_ROOT', "\"http://202.39.38.71:10004/\""
-            buildConfigField 'String', 'PORTAL_SERVER', "\"http://202.39.38.71:10002/index.php/API/\""
+            buildConfigField 'String', 'FILE_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'PORTAL_SERVER', "\"http://192.168.77.220:10002/index.php/\""
         }
         Dev {
             flavorDimensions 'model'
-            buildConfigField 'String', 'MTV_URL', "\"http://106.104.151.145:10003/mtv/%s\""
-            buildConfigField 'String', 'DS_SEVER', "\"127.0.0.1:40051\""
-            buildConfigField 'String', 'FILE_ROOT', "\"http://106.104.151.145:10001/\""
-            buildConfigField 'String', 'IMG_ROOT', "\"http://202.39.38.71:10004/\""
-            buildConfigField 'String', 'PORTAL_SERVER', "\"http://202.39.38.71:10002/index.php/API/\""
+            buildConfigField 'String', 'MTV_URL', "\"http://192.168.77.210/mtv/%s\""
+            buildConfigField 'String', 'DS_SEVER', "\"10.10.10.1:40051\""
+            buildConfigField 'String', 'FILE_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'PORTAL_SERVER', "\"http://192.168.77.220:10002/index.php/\""
         }
     }
 }

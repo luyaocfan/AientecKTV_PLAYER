@@ -227,6 +227,8 @@ class Repository private constructor(context: Context) : ModelImpl(context), Cor
                         RoomWifiService.Event.ON_RECONNECTED -> {
                               launch(coroutineContext) {
                                     wifiService.registerDeviceType(RegisterData.ClientType.PLAYER)
+                                    connectionState.postValue(true)
+                                    wifiService.nextSongRequest()
                               }
                         }
                         RoomWifiService.Event.SCORE_TOGGLE -> {
@@ -310,9 +312,9 @@ class Repository private constructor(context: Context) : ModelImpl(context), Cor
                                                 mData.effect.toInt()
                                           )
                                     }
-                                    mData.micMode != DSData.INVALID_VALUE -> audioUpdateListenerList.forEach {
+                                    mData.modulate != DSData.INVALID_VALUE -> audioUpdateListenerList.forEach {
                                           it.onToneChanged(
-                                                mData.micMode.toInt()
+                                                mData.modulate.toInt()
                                           )
                                     }
                               }

@@ -275,14 +275,12 @@ class RoomWifiService private constructor(context: Context) {
 
       fun musicVolumeControl(value: Int): Boolean {
             return sendData(
-                  VoiceData(
-                        DSData.Toggle.NONE,
-                        DSData.INVALID_VALUE,
-                        value.toUShort(),
-                        DSData.INVALID_VALUE,
-                        DSData.INVALID_VALUE
-                  )
+                  VoiceData(musicVolume = value.toUShort())
             )
+      }
+
+      fun micModulateControl(value: Int): Boolean {
+            return sendData(VoiceData(modulate = value.toUShort()))
       }
 
 

@@ -19,6 +19,7 @@ import com.aientec.appplayer.util.AudioStreamGate
 import com.aientec.appplayer.viewmodel.DebugViewModel
 import com.aientec.appplayer.viewmodel.OsdViewModel
 import com.aientec.appplayer.viewmodel.PlayerViewModel
+import com.aientec.appplayer.viewmodel.SystemViewModel
 import com.aientec.ktv_wifiap.commands.DSData
 import com.aientec.structure.Track
 import com.google.android.exoplayer2.audio.IneStereoVolumeProcessor
@@ -53,6 +54,9 @@ class PlayerFragment : Fragment() {
       private val osdViewModel: OsdViewModel by activityViewModels()
 
       private val debugViewModel: DebugViewModel by activityViewModels()
+
+
+      private val systemViewModel: SystemViewModel by activityViewModels()
 
       private val mediaUrl: String = BuildConfig.MTV_URL
 
@@ -116,7 +120,12 @@ class PlayerFragment : Fragment() {
 
             initPlayer()
 
-//        binding.root.controllerAutoShow = false
+//        binding.root.controllerAuto\Show = false
+
+            systemViewModel.connectionState.observe(viewLifecycleOwner) {
+                  if (it)
+                        playerViewModel.onOpen()
+            }
 
             playerViewModel.idleTracks.observe(viewLifecycleOwner) { list ->
                   Log.d(TAG, "Idle tracks update : ${list?.size}")
@@ -139,6 +148,8 @@ class PlayerFragment : Fragment() {
                   playerViewModel.onScoreToggle(it)
             }
 
+
+
             playerViewModel.openState.observe(viewLifecycleOwner) {
                   if (it) {
 //                        Toast.makeText(requireContext(), "包廂開啟", Toast.LENGTH_LONG).show()
@@ -146,9 +157,10 @@ class PlayerFragment : Fragment() {
                               timer!!.cancel()
                         timer = null
                         reset()
+                        playerViewModel.onOpen()
                   } else {
                         timer = Timer().apply {
-                              schedule(timerTask, 900000L)
+                              schedule(ResetTimerTask(), 900000L)
                         }
 //                        Toast.makeText(requireContext(), "包廂關閉", Toast.LENGTH_LONG).show()
                   }
@@ -156,6 +168,7 @@ class PlayerFragment : Fragment() {
       }
 
       private fun reset() {
+            Log.d("Trace", "Reset")
             val list = controller.GetOrderSongPlayList()
             for (i in 1 until list.size)
                   controller.DeleteOrderSong(1)
@@ -248,6 +261,7 @@ class PlayerFragment : Fragment() {
 
             when (playList.size) {
                   0 -> {
+
                         controller.AddOrderSong(
                               String.format(Locale.TAIWAN, BuildConfig.MTV_URL, track.fileName),
                               track.name,
@@ -299,7 +313,6 @@ class PlayerFragment : Fragment() {
 //            controller.addDataFrameCallback(audioCallback)
 
 
-            playerViewModel.onReady()
       }
 
       inner class DisplayPipeLine : AudioStreamGate.AudioStreamPipeline() {
@@ -607,9 +620,11 @@ class PlayerFragment : Fragment() {
                   }
             }
 
-      private val timerTask = object : TimerTask() {
+      private inner class ResetTimerTask : TimerTask() {
             override fun run() {
                   reset()
             }
       }
+
+
 }

@@ -28,6 +28,8 @@ class ControlViewModel : ViewModelImpl() {
 
       lateinit var micEffectVolume: LiveData<Int>
 
+      lateinit var micToneVolume: LiveData<Int>
+
       lateinit var micEffectMode: LiveData<Int>
 
       lateinit var playingState: MutableLiveData<Boolean>
@@ -52,6 +54,8 @@ class ControlViewModel : ViewModelImpl() {
             micEffectVolume = environmental.micEffectVolume
 
             micEffectMode = environmental.micEffectMode
+
+            micToneVolume = environmental.micToneVolume
       }
 
       fun cut() {
@@ -108,6 +112,18 @@ class ControlViewModel : ViewModelImpl() {
             }
       }
 
+      fun micModulateAdd() {
+            viewModelScope.launch {
+                  commandSendState.postValue(environmental.player.micModulateAddVolume())
+            }
+      }
+
+      fun micModulateDesc() {
+            viewModelScope.launch {
+                  commandSendState.postValue(environmental.player.micModulateDescVolume())
+            }
+      }
+
       fun musicVolumeAdd() {
             viewModelScope.launch {
                   commandSendState.postValue(environmental.player.musicAddVolume())
@@ -158,12 +174,8 @@ class ControlViewModel : ViewModelImpl() {
 
       fun onBasicLightSelected(code: Int, message: String) {
             viewModelScope.launch {
-                  if (code != basicLight.value) {
-                        if (code != mainMode.value) {
-                              environmental.setBasicLight(code)
-                              environmental.sendVodMessage(message)
-                        }
-                  }
+                  environmental.setBasicLight(code)
+                  environmental.sendVodMessage(message)
             }
       }
 
@@ -173,5 +185,5 @@ class ControlViewModel : ViewModelImpl() {
             }
       }
 
-      fun getAudioSrc():Int = environmental.sourceType
+      fun getAudioSrc(): Int = environmental.sourceType
 }

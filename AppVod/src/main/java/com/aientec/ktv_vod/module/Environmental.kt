@@ -85,6 +85,14 @@ class Environmental(context: Context) : ModuleImpl(context), CoroutineScope {
                   micEffectMode.postValue(field)
             }
 
+      val micToneVolume: MutableLiveData<Int> = MutableLiveData()
+
+      private var mMicToneVolume: Int = 0
+            set(value) {
+                  field = value
+                  micToneVolume.postValue(field)
+            }
+
       val micEffectMode: MutableLiveData<Int> = MutableLiveData(mMicEffectMode)
 
       override val coroutineContext: CoroutineContext
@@ -151,6 +159,7 @@ class Environmental(context: Context) : ModuleImpl(context), CoroutineScope {
       }
 
       suspend fun setBasicLight(id: Int): Boolean = withContext(Dispatchers.IO) {
+            if (mBasicLightId == id) return@withContext true
             mBasicLightId = id
             return@withContext wifiService.ledBarControl(mBasicLightId, null, null)
       }
@@ -212,7 +221,7 @@ class Environmental(context: Context) : ModuleImpl(context), CoroutineScope {
 
 
             suspend fun micAddVolume(): Boolean = withContext(Dispatchers.IO) {
-                  if (mMicVolume >= 84) return@withContext true
+                  if (mMicVolume >= 29) return@withContext true
                   mMicVolume++
                   return@withContext wifiService.micVolumeControl(mMicVolume)
             }
@@ -224,15 +233,15 @@ class Environmental(context: Context) : ModuleImpl(context), CoroutineScope {
             }
 
             suspend fun micEffectAddVolume(): Boolean = withContext(Dispatchers.IO) {
-                  if (mMicEffectVolume >= 70) return@withContext true
+                  if (mMicEffectVolume >= 29) return@withContext true
                   mMicEffectVolume++
-                  return@withContext wifiService.micEffectControl(mMusicVolume)
+                  return@withContext wifiService.micEffectControl(mMicEffectVolume)
             }
 
             suspend fun micEffectDescVolume(): Boolean = withContext(Dispatchers.IO) {
                   if (mMicEffectVolume <= 0) return@withContext true
                   mMicEffectVolume--
-                  return@withContext wifiService.micEffectControl(mMusicVolume)
+                  return@withContext wifiService.micEffectControl(mMicEffectVolume)
             }
 
             suspend fun setMicMode(mode: Int): Boolean = withContext(Dispatchers.IO) {
@@ -242,7 +251,7 @@ class Environmental(context: Context) : ModuleImpl(context), CoroutineScope {
             }
 
             suspend fun musicAddVolume(): Boolean = withContext(Dispatchers.IO) {
-                  if (mMusicVolume >= 84) return@withContext true
+                  if (mMusicVolume >= 29) return@withContext true
                   mMusicVolume++
                   return@withContext wifiService.musicVolumeControl(mMusicVolume)
             }
@@ -251,6 +260,22 @@ class Environmental(context: Context) : ModuleImpl(context), CoroutineScope {
                   if (mMusicVolume <= 0) return@withContext true
                   mMusicVolume--
                   return@withContext wifiService.musicVolumeControl(mMusicVolume)
+            }
+
+            suspend fun micModulateAddVolume(): Boolean = withContext(Dispatchers.IO) {
+                  if (mMicToneVolume >= 14) return@withContext true
+
+                  mMicToneVolume++
+
+                  return@withContext wifiService.micModulateControl(mMicToneVolume)
+            }
+
+            suspend fun micModulateDescVolume(): Boolean = withContext(Dispatchers.IO) {
+                  if (mMicToneVolume <= 0) return@withContext true
+
+                  mMicToneVolume--
+
+                  return@withContext wifiService.micModulateControl(mMicToneVolume)
             }
       }
 
@@ -283,7 +308,9 @@ class Environmental(context: Context) : ModuleImpl(context), CoroutineScope {
 
                               mMicEffectVolume = initData.effectVolume.toShort().toInt()
 
-                              mMicEffectMode = initData.micMode.toShort().toInt()
+                              mMicEffectMode = initData.micMode.toInt()
+
+                              mMicToneVolume = initData.modulate.toInt()
 
                               sourceType = initData.audioSrc.toInt()
                         }

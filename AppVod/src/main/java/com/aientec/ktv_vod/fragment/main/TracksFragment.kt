@@ -1,6 +1,7 @@
 package com.aientec.ktv_vod.fragment.main
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
@@ -57,6 +58,12 @@ class TracksFragment : Fragment() {
                   itemAdapter.list = it
             }
 
+            trackViewModel.playingTracks.observe(viewLifecycleOwner) {
+                  itemAdapter.compareTracks = it
+            }
+
+
+
             binding.ads.testCount(6)
       }
 
@@ -103,6 +110,12 @@ class TracksFragment : Fragment() {
                         notifyDataSetChanged()
                   }
 
+            var compareTracks: List<Track>? = null
+                  set(value) {
+                        field = value
+                        notifyDataSetChanged()
+                  }
+
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
                   return ItemViewHolder(
                         ItemTrackBinding.inflate(
@@ -129,6 +142,14 @@ class TracksFragment : Fragment() {
                               if (field != null) {
                                     mBinding.name.text = field!!.name
                                     mBinding.performer.text = field!!.performer
+
+                                    val color: Int =
+                                          if (compareTracks?.contains(field) == true) resources.getColor(
+                                                R.color.accentPurple,
+                                                null
+                                          ) else Color.WHITE
+                                    mBinding.name.setTextColor(color)
+                                    mBinding.performer.setTextColor(color)
                               }
                         }
 

@@ -43,7 +43,7 @@ class ControlBarFragment : Fragment() {
 
       private var toast: Toast? = null
 
-      private var startTime: Long = -1
+      private var startTime: Long = 0L
 
       override fun onCreateView(
             inflater: LayoutInflater,
@@ -168,7 +168,7 @@ class ControlBarFragment : Fragment() {
                         3 -> R.id.main_mode_3
                         4 -> R.id.main_mode_4
                         5 -> R.id.main_mode_5
-                        else -> R.id.main_mode_1
+                        else -> -1
                   }
                   settingContentBinding.mainModel.check(res)
             }
@@ -193,6 +193,17 @@ class ControlBarFragment : Fragment() {
                   }
             }
 
+            controlViewModel.basicLight.observe(viewLifecycleOwner) {
+                  val res = when (it) {
+                        6 -> R.id.basic_light_1
+                        7 -> R.id.basic_light_2
+                        8 -> R.id.basic_light_3
+                        9 -> R.id.basic_light_4
+                        else -> -1
+                  }
+                  settingContentBinding.basicLight.check(res)
+            }
+
             controlViewModel.musicVolume.observe(viewLifecycleOwner) {
                   musicControlBinding.volume.progress.progress = it
             }
@@ -206,7 +217,16 @@ class ControlBarFragment : Fragment() {
             }
 
             controlViewModel.micEffectMode.observe(viewLifecycleOwner) {
-                  micControlBinding.mode.setSelection(it + 1)
+                  Log.d("Trace", "Effect mode")
+                  try {
+                        micControlBinding.mode.setSelection(it - 1)
+                  } catch (e: Exception) {
+                        e.printStackTrace()
+                  }
+            }
+
+            controlViewModel.micToneVolume.observe(viewLifecycleOwner) {
+                  micControlBinding.tone.progress.progress = it
             }
       }
 
@@ -236,7 +256,11 @@ class ControlBarFragment : Fragment() {
                                           if (System.currentTimeMillis() - startTime > 5000L)
                                                 controlViewModel.cut()
                                           else
-                                                Toast.makeText(requireContext(), R.string.hint_cut_locked, Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(
+                                                      requireContext(),
+                                                      R.string.hint_cut_locked,
+                                                      Toast.LENGTH_SHORT
+                                                ).show()
                                     }
                                     "PAUSE" -> {
                                           if (isPubVideo) return@setOnClickListener
@@ -278,6 +302,7 @@ class ControlBarFragment : Fragment() {
       private fun initMusicPop() {
             musicControlBinding.volume.apply {
                   title.setText(R.string.label_mic_volume)
+                  progress.max = 29
 
                   dec.setOnClickListener {
                         controlViewModel.musicVolumeDesc()
@@ -292,16 +317,23 @@ class ControlBarFragment : Fragment() {
       private fun initMicPop() {
             micControlBinding.volume.apply {
                   title.setText(R.string.label_mic_volume)
-                  progress.max = 84
+                  progress.max = 29
                   add.setOnClickListener { controlViewModel.micVolumeAdd() }
                   dec.setOnClickListener { controlViewModel.micVolumeDesc() }
             }
 
             micControlBinding.effect.apply {
-                  title.setText(R.string.label_mic_effect)
-                  progress.max = 70
+                  title.setText(R.string.label_mic_echo)
+                  progress.max = 29
                   add.setOnClickListener { controlViewModel.micEffectAdd() }
                   dec.setOnClickListener { controlViewModel.micEffectDesc() }
+            }
+
+            micControlBinding.tone.apply {
+                  title.setText(R.string.label_mic_tone)
+                  progress.max = 14
+                  add.setOnClickListener { controlViewModel.micModulateAdd() }
+                  dec.setOnClickListener { controlViewModel.micModulateDesc() }
             }
 //            micControlBinding.mode.setSelection(0)
             micControlBinding.mode.onItemSelectedListener =
@@ -312,7 +344,7 @@ class ControlBarFragment : Fragment() {
                               position: Int,
                               id: Long
                         ) {
-                              controlViewModel.onMicModeSelected(position - 1)
+                              controlViewModel.onMicModeSelected(position + 1)
                         }
 
                         override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -372,14 +404,17 @@ class ControlBarFragment : Fragment() {
                         R.id.main_mode_5 -> 5
                         else -> 1
                   }
-
-                  controlViewModel.onMainModeSelected(
-                        code,
-                        "${
-                              group.findViewById<RadioButton>(checkedId).text.toString()
-                                    .replace("\n", "")
-                        }模式"
-                  )
+                  try {
+                        controlViewModel.onMainModeSelected(
+                              code,
+                              "${
+                                    group.findViewById<RadioButton>(checkedId).text.toString()
+                                          .replace("\n", "")
+                              }模式"
+                        )
+                  } catch (e: Exception) {
+                        e.printStackTrace()
+                  }
             }
 
             settingContentBinding.subModeReset.setOnClickListener {
@@ -387,6 +422,7 @@ class ControlBarFragment : Fragment() {
                   settingContentBinding.subMode2.clearCheck()
                   controlViewModel.onModeReset()
             }
+
 
             settingContentBinding.basicLight.setOnCheckedChangeListener { group, checkedId ->
                   val code: Int = when (checkedId) {
@@ -396,10 +432,15 @@ class ControlBarFragment : Fragment() {
                         R.id.basic_light_4 -> 9
                         else -> 6
                   }
-                  controlViewModel.onBasicLightSelected(
-                        code,
-                        "燈光 : ${group.findViewById<RadioButton>(checkedId).text}"
-                  )
+                  Log.d("Trace", "Code : $code")
+                  try {
+                        controlViewModel.onBasicLightSelected(
+                              code,
+                              "燈光 : ${group.findViewById<RadioButton>(checkedId).text}"
+                        )
+                  } catch (e: Exception) {
+                        e.printStackTrace()
+                  }
             }
             settingContentBinding.effect1.setOnTouchListener(EffectTouchEvent(18))
 
@@ -518,12 +559,6 @@ class ControlBarFragment : Fragment() {
                   }
 
                   return false
-            }
-
-            private val timerTask: TimerTask = object : TimerTask() {
-                  override fun run() {
-
-                  }
             }
       }
 }

@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.*
-import java.lang.Exception
 import java.lang.IndexOutOfBoundsException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
@@ -35,6 +34,7 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
+import kotlin.Exception
 import kotlin.collections.ArrayList
 
 
@@ -77,15 +77,11 @@ class Repository(context: Context) : ModuleImpl(context) {
 
       private val databaseReader: KtvDatabaseReader = KtvDatabaseReader.getInstance()
 
-      private var startTime: Long = -1L
-
-      private var endTime: Calendar? = null
-
       private var timer: Timer? = null
 
       private var addTrackRunnable: AddTrackRunnable? = null
 
-      private var addThread: ExecutorService = Executors.newSingleThreadExecutor()
+      private var trackCtrlThread: ExecutorService = Executors.newSingleThreadExecutor()
 
       private val mPlayingTracks: ArrayList<Track> = ArrayList()
 
@@ -94,6 +90,10 @@ class Repository(context: Context) : ModuleImpl(context) {
       private lateinit var userImgFilePath: File
 
       lateinit var uuid: String
+
+      private val updateTimer: Timer = Timer()
+
+      private var isRoomOpen: Boolean = false
 
       val roomId: Int
             get() = configuration?.roomId ?: -1
@@ -225,30 +225,6 @@ class Repository(context: Context) : ModuleImpl(context) {
 
             return@withContext true
 
-//        try {
-//            val assetManager: AssetManager = contextRef.get()?.assets ?: return@withContext false
-//
-//            val inStream: InputStream = assetManager.open("ktvsong.db")
-//
-//            val outStream: FileOutputStream = FileOutputStream(file, false)
-//
-//            val count: Long = inStream.copyTo(outStream)
-//
-//            Log.d("Trace", "Copy : $count bytes")
-//
-//            outStream.close()
-//            inStream.close()
-//
-//            if (databaseReader.openDatabase(file.absolutePath)) {
-//                idleTracks.postValue(databaseReader.getIdleTracks())
-//                albums.postValue(databaseReader.getTrackLists())
-//            }
-//        } catch (e: IOException) {
-//            e.printStackTrace()
-//            return@withContext false
-//        }
-//
-//        return@withContext true
       }
 
       suspend fun getStores(): List<Store>? = withContext(Dispatchers.IO) {
@@ -485,16 +461,29 @@ class Repository(context: Context) : ModuleImpl(context) {
 
                               val d = dsData as RoomSwitchData
                               Log.d("Repo", "RoomSwitchData : ${d.switch}")
+                              isRoomOpen = if (d.switch) {
+                                    getOpenInfo()
+                              } else {
+                                    mPlayingTracks.clear()
+                                    playingTracks.postValue(mPlayingTracks)
+                                    currantPlayingTrack.postValue(null)
+                                    prepareTrack.postValue(null)
+                                    timer?.cancel()
+                                    false
+                              }
                               roomOpen.postValue(
-                                    if (d.switch) {
-                                          getOpenInfo()
-                                    } else {
-                                          mPlayingTracks.clear()
-                                          playingTracks.postValue(mPlayingTracks)
-                                          timer?.cancel()
-                                          false
-                                    }
+                                    isRoomOpen
                               )
+
+
+                        }
+                        RoomWifiService.Event.INIT_NOTIFY -> {
+//                              try {
+//                                    updateTimer.scheduleAtFixedRate(updateTask, 5000L, 5000L)
+//                              } catch (e: Exception) {
+//                                    e.printStackTrace()
+//                              }
+                              return@EventListener false
                         }
                         RoomWifiService.Event.TRACKS_UPDATE -> {
                               val data = dsData as PlayListData
@@ -509,6 +498,7 @@ class Repository(context: Context) : ModuleImpl(context) {
                               playingTracks.postValue(mPlayingTracks)
                               currantPlayingTrack.postValue(list.find { it.state == Track.State.PLAYING })
                               prepareTrack.postValue(list.find { it.state == Track.State.NEXT })
+
                         }
                         RoomWifiService.Event.ADD_SONG -> {
 
@@ -516,7 +506,7 @@ class Repository(context: Context) : ModuleImpl(context) {
 
                               if (addTrackRunnable == null) {
                                     addTrackRunnable = AddTrackRunnable()
-                                    addThread.execute(addTrackRunnable)
+                                    trackCtrlThread.execute(addTrackRunnable)
                               }
 
                               addTrackRunnable!!.addTrack(data.track ?: return@EventListener true)
@@ -606,43 +596,51 @@ class Repository(context: Context) : ModuleImpl(context) {
                               val data = dsData as PlayerData
                               when (data.func) {
                                     DSData.PlayerFunc.NEXT -> {
-                                          val list: ArrayList<Track> = mPlayingTracks
+                                          trackCtrlThread.submit {
+                                                Log.d("Trace", "Next")
+                                                val list: ArrayList<Track> = mPlayingTracks
 
-                                          val index: Int = list.indexOf(currantPlayingTrack.value)
-
-                                          if (index == -1) {
-                                                val playIndex: Int =
-                                                      list.indexOfFirst { it.state == Track.State.QUEUE }
-
-                                                if (playIndex != -1) {
-                                                      list[playIndex].state = Track.State.PLAYING
-                                                      currantPlayingTrack.postValue(list[playIndex])
+                                                val index: Int = list.indexOfFirst {
+                                                      return@indexOfFirst it.state == Track.State.NEXT
                                                 }
 
-                                                if (playIndex < list.lastIndex) {
-                                                      list[playIndex + 1].state = Track.State.NEXT
-                                                      prepareTrack.postValue(list[playIndex + 1])
-                                                }
+                                                if (index == -1) {
+                                                      val playIndex: Int =
+                                                            list.indexOfFirst { it.state == Track.State.QUEUE }
 
-                                          } else {
-                                                list[index].state = Track.State.DONE
+                                                      if (playIndex != -1) {
+                                                            list[playIndex].state =
+                                                                  Track.State.PLAYING
+                                                            currantPlayingTrack.postValue(list[playIndex])
+                                                      }
 
-                                                if (index + 1 <= list.lastIndex) {
-                                                      list[index + 1].state = Track.State.PLAYING
-                                                      currantPlayingTrack.postValue(list[index + 1])
+                                                      if (playIndex < list.lastIndex) {
+                                                            list[playIndex + 1].state =
+                                                                  Track.State.NEXT
+                                                            prepareTrack.postValue(list[playIndex + 1])
+                                                      }
+
                                                 } else {
-                                                      currantPlayingTrack.postValue(null)
-                                                }
+                                                      list[index].state = Track.State.DONE
 
-                                                if (index + 2 <= list.lastIndex) {
-                                                      list[index + 2].state = Track.State.NEXT
-                                                      prepareTrack.postValue(list[index + 2])
-                                                } else {
-                                                      prepareTrack.postValue(null)
-                                                }
+                                                      if (index + 1 <= list.lastIndex) {
+                                                            list[index + 1].state =
+                                                                  Track.State.PLAYING
+                                                            currantPlayingTrack.postValue(list[index + 1])
+                                                      } else {
+                                                            currantPlayingTrack.postValue(null)
+                                                      }
 
+                                                      if (index + 2 <= list.lastIndex) {
+                                                            list[index + 2].state = Track.State.NEXT
+                                                            prepareTrack.postValue(list[index + 2])
+                                                      } else {
+                                                            prepareTrack.postValue(null)
+                                                      }
+
+                                                }
+                                                playingTracks.postValue(list)
                                           }
-                                          playingTracks.postValue(list)
                                     }
                                     DSData.PlayerFunc.DONE -> {
                                           var list: ArrayList<Track>? = null
@@ -757,16 +755,20 @@ class Repository(context: Context) : ModuleImpl(context) {
                   }
 
                   Log.d("Trace", "Update...")
-                  if (!isListRefreshed)
-                        playingTracks.postValue(list)
 
+                  if (!isListRefreshed) {
+//                        mPlayingTracks.addAll(list)
+                        playingTracks.postValue(mPlayingTracks)
+                  }
                   addTrackRunnable = null
             }
 
             fun addTrack(track: Track) {
+                  Log.d("Trace", "Add track : ${track.name}")
+
                   runTime = System.currentTimeMillis()
 
-                  if (lastTrack == null || lastTrack?.state == Track.State.PLAYING) {
+                  if (lastTrack == null || lastTrack?.state == Track.State.PLAYING || lastTrack?.state == Track.State.DONE) {
                         track.state = Track.State.NEXT
                         prepareTrack.postValue(track)
                   } else {
@@ -775,5 +777,13 @@ class Repository(context: Context) : ModuleImpl(context) {
 
                   list.add(track)
             }
+      }
+
+      private val updateTask: TimerTask = object : TimerTask() {
+            override fun run() {
+                  if (false)
+                        wifiService.delTrack(0, -1)
+            }
+
       }
 }

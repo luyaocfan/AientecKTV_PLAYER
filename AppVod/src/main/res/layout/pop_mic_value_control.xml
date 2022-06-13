@@ -23,11 +23,20 @@
             android:layout_margin="4dp" />
 
         <include
+            android:id="@+id/tone"
+            layout="@layout/item_seek_set"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp" />
+
+        <include
             android:id="@+id/effect"
             layout="@layout/item_seek_set"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp" />
+
+
 
         <Spinner
             android:id="@+id/mode"
