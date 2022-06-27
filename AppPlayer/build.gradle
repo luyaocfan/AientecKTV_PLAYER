@@ -71,6 +71,14 @@ android {
             buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.77.200:10001/\""
             buildConfigField 'String', 'PORTAL_SERVER', "\"http:/106.104.151.145:10002/index.php/\""
         }
+        hassen_local {
+            flavorDimensions 'model'
+            buildConfigField 'String', 'MTV_URL', "\"http://192.168.99.152/%s\""
+            buildConfigField 'String', 'DS_SEVER', "\"106.104.151.145:40051\""
+            buildConfigField 'String', 'FILE_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'PORTAL_SERVER', "\"http:/106.104.151.145:10002/index.php/\""
+        }
     }
 }
 
@@ -103,6 +111,12 @@ dependencies {
 
 
 //    implementation fileTree(dir: '../../prebuild', include: ['*.aar', '*.jar'], exclude: [])
+
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
+    implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'io.netty:netty-all:5.0.0.Alpha2'
+
     implementation(name: 'core-0.0.1', ext: 'aar')
     //implementation 'com.aientec.ktv:core:0.0.1'
     implementation(name: 'portal-0.0.1', ext: 'aar')
