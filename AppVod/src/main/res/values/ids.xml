@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <item name="keyboardView" type="id" />
-    <item name="closeButton" type="id" />
-    <item name="button_close" type="id" />
-    <item name="tag_codes" type="id" />
-    <item name="tag_output" type="id" />
-</resources>

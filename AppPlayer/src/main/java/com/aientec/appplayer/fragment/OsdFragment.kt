@@ -136,16 +136,13 @@ class OsdFragment : Fragment() {
                   }
                   MessageBundle.Type.TXT -> {
                         OSDBarrageItem(
-                              "${messageBundle.sender} : ${messageBundle.data as String}",
+                              " ${messageBundle.data as String}",
                               OSDBarrageItem.Direction.RIGHT_TO_LEFT,
                               2.0f,
                               Color.WHITE,
                               false,
                               20000L,
-                              if (messageBundle.senderIcon == null) BitmapFactory.decodeResource(
-                                    resources,
-                                    R.drawable.ic_replay
-                              ) else BitmapFactory.decodeFile(messageBundle.senderIcon!!),
+                              null,
                               Pair(0.07f, 0.6f)
                         )
                   }
@@ -457,7 +454,6 @@ class OsdFragment : Fragment() {
 
       private fun showIdleTag() {
             Log.d(TAG, "Show Idle tag")
-
             binding.idleTag.visibility = View.VISIBLE
 //        if (idleTag == null) {
 //            idleTag = OSDViewItem(

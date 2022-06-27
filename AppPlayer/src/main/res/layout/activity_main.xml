@@ -6,11 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".activity.MainActivity">
 
-    <fragment
-        android:name="com.aientec.appplayer.fragment.PlayerFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:tag="player" />
+        <fragment
+            android:name="com.aientec.appplayer.fragment.PlayerFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tag="player" />
+
+<!--    <fragment-->
+<!--        android:name="com.aientec.appplayer.fragment.EmulatorFragment"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:tag="emulator" />-->
 
 
     <fragment

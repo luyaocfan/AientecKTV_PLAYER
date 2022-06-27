@@ -188,17 +188,6 @@ class PlayerViewModel : ViewModelImpl() {
             }
       }
 
-      fun testFn() {
-            Thread {
-                  Log.d("Trace", "Pause")
-                  mtvEvent.postValue(EventBundle(MTVEvent.ON_NEXT_DISPLAY, Track().apply {
-                        name = "TTTTT"
-                        sn = "T9999F"
-                        performer = "EEE"
-                  }))
-            }.start()
-
-      }
 
       private val listener: Repository.EventListener = object : Repository.EventListener {
             override fun onNextTrack(track: Track?) {
