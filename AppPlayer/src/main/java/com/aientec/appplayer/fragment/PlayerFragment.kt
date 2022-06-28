@@ -357,13 +357,11 @@ class PlayerFragment : Fragment() {
 
 //            controller.AddPubVideo("http://192.168.77.210/mtv/41006YH3.mp4", "tester")
 
-        controller.AddPubVideo("https://www.hassen.myds.me/h265_60/CM100001_re.mp4", "Pop_1")
-
         controller.AddPubVideo("https://www.hassen.myds.me/h265_60/CM100002_re.mp4", "Pop_2")
-
+        controller.AddPubVideo("https://www.hassen.myds.me/h265_60/CM100001_re.mp4", "Pop_1")
         controller.AddPubVideo("https://www.hassen.myds.me/h265_60/CM100003_re.mp4", "Pop_3")
-
         controller.AddPubVideo("https://www.hassen.myds.me/h265_60/CM100004_re.mp4", "Pop_4")
+
 
         controller.open()
     }
