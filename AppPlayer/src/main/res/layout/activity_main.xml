@@ -20,12 +20,6 @@
 
 
 <!--    <fragment-->
-<!--        android:name="com.aientec.appplayer.fragment.OsdFragment"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:tag="osd" />-->
-
-<!--    <fragment-->
 <!--        android:name="com.aientec.appplayer.fragment.DebugFragment"-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="match_parent"-->
