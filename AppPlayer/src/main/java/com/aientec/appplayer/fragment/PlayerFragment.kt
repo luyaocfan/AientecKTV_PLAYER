@@ -49,13 +49,13 @@ import java.util.concurrent.Future
 
 class PlayerFragment : Fragment() {
     companion object {
-        const val MAXIMUM_CACHE_COUNT: Int = 4
+        const val MAXIMUM_CACHE_COUNT: Int = 2
 
-        const val MAXIMUM_CACHE_SIZE: Int = 1024 * 1024 * 16
+        const val MAXIMUM_CACHE_SIZE: Int = 1024 * 1024 * 64
 
-        const val PLAYING_BUFFER_SIZE: Int = MAXIMUM_CACHE_SIZE * 2
-
-        val CACHE_BANDWIDTH_KBS = intArrayOf(4096, 1024, 512, 256)
+        const val ORDER_SONG_PLAYERING_BUFFER_SIZE: Int = 1024 * 1024 * 64
+        const val PUBLIC_VIDEO_PLAYERING_BUFFER_SIZE: Int = 1024 * 1024 * 32
+        val CACHE_BANDWIDTH_KBS = intArrayOf(65536, 65536)
 
         const val TAG: String = "PlayerFrag"
     }
@@ -356,9 +356,9 @@ class PlayerFragment : Fragment() {
 //        }
 
 //            controller.AddPubVideo("http://192.168.77.210/mtv/41006YH3.mp4", "tester")
-
-        controller.AddPubVideo("https://www.hassen.myds.me/h265_60/CM100002_re.mp4", "Pop_2")
+       // controller.AddPubVideo("http://192.168.99.152/100011_re_h265.mp4", "Pop_0")
         controller.AddPubVideo("https://www.hassen.myds.me/h265_60/CM100001_re.mp4", "Pop_1")
+        controller.AddPubVideo("https://www.hassen.myds.me/h265_60/CM100002_re.mp4", "Pop_2")
         controller.AddPubVideo("https://www.hassen.myds.me/h265_60/CM100003_re.mp4", "Pop_3")
         controller.AddPubVideo("https://www.hassen.myds.me/h265_60/CM100004_re.mp4", "Pop_4")
 
@@ -386,14 +386,14 @@ class PlayerFragment : Fragment() {
                 controller.AddOrderSong(
                     String.format(Locale.TAIWAN, BuildConfig.MTV_URL, track.fileName),
                     track.name,
-                    PLAYING_BUFFER_SIZE
+                    ORDER_SONG_PLAYERING_BUFFER_SIZE
                 )
             }
             1 -> {
                 controller.AddOrderSong(
                     String.format(Locale.TAIWAN, BuildConfig.MTV_URL, track.fileName),
                     track.name,
-                    PLAYING_BUFFER_SIZE
+                    ORDER_SONG_PLAYERING_BUFFER_SIZE
                 )
             }
             2 -> {
@@ -401,7 +401,7 @@ class PlayerFragment : Fragment() {
                 controller.InsertOrderSong(
                     1, String.format(Locale.TAIWAN, BuildConfig.MTV_URL, track.fileName),
                     track.name,
-                    PLAYING_BUFFER_SIZE
+                    ORDER_SONG_PLAYERING_BUFFER_SIZE
                 )
                 controller.DeleteOrderSong(2)
             }
@@ -416,6 +416,7 @@ class PlayerFragment : Fragment() {
                 orderSongView = binding.playView
                 maxCacheCount = MAXIMUM_CACHE_COUNT
                 itemCacheSize = MAXIMUM_CACHE_SIZE
+                publicVideoPlayingBufferSize = PUBLIC_VIDEO_PLAYERING_BUFFER_SIZE
                 cacheBandwidthKBS = CACHE_BANDWIDTH_KBS
                 listener = eventListener
             }
