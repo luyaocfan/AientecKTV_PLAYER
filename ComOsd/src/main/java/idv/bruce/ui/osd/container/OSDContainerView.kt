@@ -105,7 +105,7 @@ class OSDContainerView(context: Context, attr: AttributeSet) : View(context, att
     }
 
     override fun doFrame(frameTimeNanos: Long) {
-        postInvalidate()
+        //postInvalidate()
         choreographer.postFrameCallback(this)
     }
 
