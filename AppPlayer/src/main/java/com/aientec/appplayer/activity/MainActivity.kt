@@ -76,9 +76,9 @@ class MainActivity : AppCompatActivity() {
 
             playerViewModel.onRepositoryAttach(repository)
 
-            osdViewModel.onRepositoryAttach(repository)
-
-            debugViewModel.onRepositoryAttach(repository)
+//            osdViewModel.onRepositoryAttach(repository)
+//
+//            debugViewModel.onRepositoryAttach(repository)
 
             systemViewModel.isDataSyn.observe(this) {
                   val res: Boolean = it ?: return@observe
