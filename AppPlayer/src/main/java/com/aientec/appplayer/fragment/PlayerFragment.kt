@@ -1106,12 +1106,12 @@ private fun onMessageEvent(messageBundle: MessageBundle) {
     //end OSD    
     private val eventListener: InePlayerController.EventListen =
         object : InePlayerController.EventListen {
-            override fun onPlayListChange(controller: InePlayerController?) {
-                super.onPlayListChange(controller)
+            override fun onPlayListChange(controller: InePlayerController?, isPublicVideo: Boolean) {
+                //super.onPlayListChange(controller,isPublicVideo)
             }
 
             override fun onOrderSongFinish(controller: InePlayerController?) {
-                super.onOrderSongFinish(controller)
+                //super.onOrderSongFinish(controller)
                 Log.d(TAG, "onOrderSongFinish")
             }
 
@@ -1120,7 +1120,7 @@ private fun onMessageEvent(messageBundle: MessageBundle) {
                 Name: String?,
                 isPublicVideo: Boolean
             ) {
-                super.onStop(controller, Name, isPublicVideo)
+                //super.onStop(controller, Name, isPublicVideo)
                 Log.d(TAG, "onStop : $Name, $isPublicVideo")
 
                 if (!isPublicVideo) {
@@ -1135,7 +1135,7 @@ private fun onMessageEvent(messageBundle: MessageBundle) {
                 Name: String?,
                 isPublicVideo: Boolean
             ) {
-                super.onNext(controller, Name, isPublicVideo)
+                //super.onNext(controller, Name, isPublicVideo)
                 Log.d(TAG, "onNext : $Name, $isPublicVideo")
                 tName = Name ?: "Null"
                 if (!isPublicVideo) {
@@ -1152,16 +1152,17 @@ private fun onMessageEvent(messageBundle: MessageBundle) {
                 controller: InePlayerController?,
                 Name: String?
             ) {
-                super.onNextSongDisplay(controller, Name)
+                //super.onNextSongDisplay(controller, Name)
                 Log.d(TAG, "onNextSongDisplay : $Name")
                 playerViewModel.onNextDisplay()
             }
 
             override fun onLoadingError(
                 controller: InePlayerController?,
-                Name: String?
+                Name: String?,
+                isPublicVideo : Boolean
             ) {
-                super.onLoadingError(controller, Name)
+                //super.onLoadingError(controller, Name)
                 Log.d(TAG, "onLoadingError : $Name")
                 if(currantName != null){
                     currantName = null
@@ -1173,9 +1174,10 @@ private fun onMessageEvent(messageBundle: MessageBundle) {
             override fun onPlayingError(
                 controller: InePlayerController?,
                 Name: String?,
-                Message: String?
+                Message: String?,
+                isPublicVideo : Boolean
             ) {
-                super.onPlayingError(controller, Name, Message)
+                //super.onPlayingError(controller, Name, Message)
                 Log.d(TAG, "onPlayingError : $Name, $Message")
                 try {
                     if(currantName != null){
@@ -1195,11 +1197,11 @@ private fun onMessageEvent(messageBundle: MessageBundle) {
                 }
             }
 
-            override fun onAudioChannelMappingChanged(
+            override fun onOrderSongAudioChannelMappingChanged(
                 controller: InePlayerController?,
                 type: Int
             ) {
-                super.onAudioChannelMappingChanged(controller, type)
+                //super.onAudioChannelMappingChanged(controller, type)
                 Log.d(TAG, "onAudioChannelMappingChanged : $type")
             }
         }

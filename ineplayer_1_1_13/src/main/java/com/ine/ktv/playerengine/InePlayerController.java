@@ -280,16 +280,16 @@ public class InePlayerController {
     private InePlayerControllerConfigure config;
 
     public interface EventListen {
-        default void onPlayListChange(InePlayerController controller) {};
+        default void onPlayListChange(InePlayerController controller, boolean isPublicVideo) {};
         default void onOrderSongFinish(InePlayerController controller) {};
         default void onStop(InePlayerController controller, String Name, boolean isPublicVideo) {};
         default void onNext(InePlayerController controller, String Name, boolean isPublicVideo) {};
         default void onNextSongDisplay(InePlayerController controller, String Name) {}
-        default void onLoadingError(InePlayerController controller, String Name) {};
-        default void onPlayingError(InePlayerController controller, String Name, String Message) {};
+        default void onLoadingError(InePlayerController controller, String Name, boolean isPublicVideo) {};
+        default void onPlayingError(InePlayerController controller, String Name, String Message, boolean isPublicVideo) {};
         default void onRemovePrepareErrorOrderSong(InePlayerController controller, String Name, String url) {};
         default void onRemovePrepareErrorPublicVideo(InePlayerController controller, String Name, String url) {};
-        default void onAudioChannelMappingChanged(InePlayerController controller, int type) {};
+        default void onOrderSongAudioChannelMappingChanged(InePlayerController controller, int type) {};
     }
     public InePlayerController(InePlayerControllerConfigure config) {
         this.config = config.clone();
@@ -299,17 +299,18 @@ public class InePlayerController {
 
         stereoVolumeProcessor = new IneStereoVolumeProcessor(orderSongPlayerListener);
         trackSelector = new DefaultTrackSelector(this.config.context);
-        IneRenderersFactory factory = new IneRenderersFactory(this.config.context, stereoVolumeProcessor);
-        factory.setExtensionRendererMode( DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
+        IneRenderersFactory ineRenderersFactory = new IneRenderersFactory(this.config.context, stereoVolumeProcessor);
+        ineRenderersFactory.setExtensionRendererMode( DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
 
-        orderSongPlayer = new SimpleExoPlayer.Builder(this.config.context, factory)
+        orderSongPlayer = new SimpleExoPlayer.Builder(this.config.context, ineRenderersFactory)
                 .setTrackSelector(trackSelector)
                 .build();
         showCodecs();
         orderSongPlayer.addListener(orderSongPlayerListener);
         config.orderSongView.setPlayer(orderSongPlayer);
-
-        publicVideoPlayer = new SimpleExoPlayer.Builder(this.config.context).build();
+        DefaultRenderersFactory defaultRenderersFactory = new DefaultRenderersFactory(this.config.context);
+        defaultRenderersFactory.setExtensionRendererMode( DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
+        publicVideoPlayer = new SimpleExoPlayer.Builder(this.config.context, defaultRenderersFactory).build();
         publicVideoPlayer.addListener(publicVideoPlayerListener);
         publicVideoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
         config.publicVideoView.setPlayer(publicVideoPlayer);
@@ -378,7 +379,7 @@ public class InePlayerController {
             mediaSource.dataSource.startCacheBuffer(config.itemCacheSize, config.cacheBandwidthKBS[cacheCount]);
             cacheCount++;
         }
-        PlayListChange();
+        PlayListChange(false);
     }
 
     public void AddPubVideo(String url, String name) {
@@ -400,7 +401,7 @@ public class InePlayerController {
         mediaSource.dataSource.listener = publicVideoPlayerListener;
         mediaSource.SongName = name;
         publicVideos.add(mediaSource);
-        PlayListChange();
+        PlayListChange(true);
     }
     public void SetPubVideos(String urls[],String names[]) {
         if(Looper.myLooper() != Looper.getMainLooper()) {
@@ -422,7 +423,7 @@ public class InePlayerController {
             mediaSource.SongName = names[i];
             publicVideos.add(mediaSource);
         }
-        PlayListChange();
+        PlayListChange(true);
     }
 
     //    public void SelectPubVideo(int index) {
@@ -439,7 +440,7 @@ public class InePlayerController {
                 cacheCount--;
             orderSongs.get(index).dataSource.freeCacheBuffer();
             orderSongs.remove(index);
-            PlayListChange();
+            PlayListChange(false);
         }
     }
     public String[] GetOrderSongPlayList() {
@@ -512,7 +513,7 @@ public class InePlayerController {
         if(orderSongs.size()>0) {
             setCurrentPlayer(orderSongPlayer);
             if (!Paused)
-                PlayListChange();
+                PlayListChange(false);
             else
                 Paused = false;
         }
@@ -571,7 +572,7 @@ public class InePlayerController {
                 mediaSource.dataSource.freeCacheBuffer();
                 orderSongs.remove(0);
 
-                PlayListChange();
+                PlayListChange(false);
                 int orderSongIdx;
                 for(orderSongIdx = 0; orderSongIdx < orderSongs.size() && (cacheCount < config.maxCacheCount); orderSongIdx++) {
                     mediaSource = orderSongs.get(orderSongIdx);
@@ -602,7 +603,7 @@ public class InePlayerController {
                 orderSongs.get(0).dataSource.freeCacheBuffer();
                 orderSongs.remove(0);
 
-                PlayListChange();
+                PlayListChange(false);
                 //setAudioOutput(IneStereoVolumeProcessor.AudioControlOutput_Stereo);
                 int CurrentPublicVideoWindow = publicVideoPlayer.getCurrentWindowIndex();
                 //publicVideoPlayer.seekTo(CurrentPublicVideoWindow, CurrentPublicVideoPosition);
@@ -812,7 +813,7 @@ public class InePlayerController {
         else {
             stereoVolumeProcessor.setMode(type);
         }
-        config.listener.onAudioChannelMappingChanged(this, type);
+        config.listener.onOrderSongAudioChannelMappingChanged(this, type);
     }
     private void switchToOrderSongPlayer() {
         publicVideoPlayer.stop();
@@ -870,8 +871,8 @@ public class InePlayerController {
             currentPlayer = publicVideoPlayer;
         }
     }
-    protected void PlayListChange() {
-        config.listener.onPlayListChange(this);
+    protected void PlayListChange(boolean isPublicVideo) {
+        config.listener.onPlayListChange(this, isPublicVideo);
     }
     protected void onOrderSongReady() {
         //play();
@@ -886,10 +887,12 @@ public class InePlayerController {
         Log.d("onPublicVideoEnd","End");
     }
     protected void onOrderSongLoadError(MediaPeriodId mediaPeriodId) {
+        String SongName;
         if(orderSongs.size()>0)
-            config.listener.onLoadingError(this, orderSongs.get(0).SongName);
+            SongName = orderSongs.get(0).SongName;
         else
-            config.listener.onLoadingError(this, "Unknown");
+            SongName = "Unknown";
+        config.listener.onLoadingError(this, SongName, false);
         stop();
     }
 
@@ -900,14 +903,16 @@ public class InePlayerController {
             SongName="公播:"+publicVideos.get(idx).SongName;
         else
             SongName="公播:未知歌曲";
-        config.listener.onLoadingError(this, SongName);
+        config.listener.onLoadingError(this, SongName, true);
         publicVideoNext();
     }
     protected void onOrderSongPlayErrorMessage(String message) {
+        String SongName;
         if(orderSongs.size()>0)
-            config.listener.onPlayingError(this, orderSongs.get(0).SongName, message);
+            SongName = orderSongs.get(0).SongName;
         else
-            config.listener.onPlayingError(this, "Unknown", message);
+            SongName = "Unknown";
+        config.listener.onPlayingError(this, SongName, message, false);
     }
 
     protected void onPublicVideoPlayMessage(String message) {
@@ -917,7 +922,7 @@ public class InePlayerController {
             SongName="公播:"+publicVideos.get(idx).SongName;
         else
             SongName="公播:未知歌曲";
-        config.listener.onPlayingError(this, SongName, message);
+        config.listener.onPlayingError(this, SongName, message, true);
     }
     protected void onOrderSongPlayerError(MediaPeriodId mediaPeriodId) {
         orderSongPlayerHadError = true;
@@ -934,7 +939,7 @@ public class InePlayerController {
                 config.listener.onRemovePrepareErrorOrderSong(this,item.SongName, item.dataSource.uri.toString());
                 item.dataSource.freeCacheBuffer();
                 orderSongs.remove(idx);
-                config.listener.onPlayListChange(this);
+                PlayListChange(false);
             }
         }
         else {
@@ -957,7 +962,7 @@ public class InePlayerController {
                 IneMediaSource item = publicVideos.get(idx);
                 config.listener.onRemovePrepareErrorPublicVideo(this,item.SongName, item.dataSource.uri.toString());
                 publicVideos.remove(idx);
-                config.listener.onPlayListChange(this);
+                PlayListChange(true);
             }
         }
         else {
