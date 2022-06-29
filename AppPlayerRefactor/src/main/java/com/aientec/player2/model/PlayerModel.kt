@@ -8,7 +8,6 @@ import com.aientec.ktv_portal2.PortalService2
 import com.aientec.ktv_wifiap.RoomWifiService
 import com.aientec.ktv_wifiap.commands.*
 import com.aientec.player2.BuildConfig
-import com.aientec.player2.data.MTVEvent
 import com.aientec.player2.data.MessageBundle
 import com.aientec.structure.Track
 import com.aientec.structure.User
@@ -43,11 +42,6 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
         }
     }
 
-    interface EventListener {
-        fun onNextTrack(track: Track?)
-        fun onScoreMode(enable: Boolean)
-    }
-
     interface AudioUpdateListener {
         fun onRecorderToggle(toggle: Boolean)
         fun onMicVolumeChanged(value: Int)
@@ -56,20 +50,33 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
         fun onToneChanged(value: Int)
     }
 
+    interface PlayerControlListener {
+        fun onAddTrack(track: Track?)
+        fun onResume()
+        fun onPause()
+        fun onCut()
+        fun onReplay()
+        fun onMuteToggle(mute: Boolean)
+        fun onScoreToggle(enable: Boolean)
+        fun onVocalChanged(type: Int)
+    }
+
+    interface OsdListener {
+        fun onOsdEvent(messageBundle: MessageBundle)
+    }
+
 
     private val portalService: PortalService2 = PortalService2.getInstance(context)
 
     private val wifiService: RoomWifiService = RoomWifiService.getInstance(context)
 
-    val mtvEvent: MutableLiveData<MTVEvent?> = MutableLiveData(null)
-
-    val osdMessage: MutableLiveData<MessageBundle> = MutableLiveData()
-
-    val scoreToggle: MutableLiveData<Boolean> = MutableLiveData(false)
-
     val connectionState: MutableLiveData<Boolean> = MutableLiveData()
 
     val openState: MutableLiveData<Boolean> = MutableLiveData()
+
+    var playerControlListener: PlayerControlListener? = null
+
+    var osdListener: OsdListener? = null
 
     private val contextRef: WeakReference<Context> = WeakReference(context)
 
@@ -84,7 +91,6 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
 
     private val remoteFile: String = "${BuildConfig.IMG_ROOT}%s"
 
-    private val eventListerList: ArrayList<EventListener> = ArrayList()
 
     private val audioUpdateListenerList: ArrayList<AudioUpdateListener> = ArrayList()
 
@@ -119,16 +125,6 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
 
     fun release() {
         wifiService.release()
-    }
-
-    fun addEventListener(listener: EventListener) {
-        if (!eventListerList.contains(listener))
-            eventListerList.add(listener)
-    }
-
-    fun removeListener(listener: EventListener) {
-        if (eventListerList.contains(listener))
-            eventListerList.remove(listener)
     }
 
     fun addAudioUpdateListener(listener: AudioUpdateListener) {
@@ -237,7 +233,7 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
                 }
                 RoomWifiService.Event.SCORE_TOGGLE -> {
                     val data = dsData as ScoreData
-                    eventListerList.forEach { it.onScoreMode(data.toggle == DSData.Toggle.ON) }
+                    playerControlListener?.onScoreToggle(data.toggle == DSData.Toggle.ON)
                 }
                 RoomWifiService.Event.DEBUG_LOG -> {
 
@@ -258,28 +254,23 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
 
                     Log.d("Repo", "Next song : ${track.toString()}")
 
-                    mtvEvent.postValue(MTVEvent.ADD_TRACK(track))
+                    playerControlListener?.onAddTrack(track)
 //                    eventListerList.forEach { it.onNextTrack(track) }
                 }
                 RoomWifiService.Event.VOD_PLAY_CTRL -> {
                     val data = dsData as PlayerData
-                    val event: MTVEvent? = when (data.func) {
-                        DSData.PlayerFunc.NONE -> null
-                        DSData.PlayerFunc.ORIGINAL_VOCALS -> MTVEvent.VOCAL_CHANGE(1)
-                        DSData.PlayerFunc.BACKING_VOCALS -> MTVEvent.VOCAL_CHANGE(2)
-                        DSData.PlayerFunc.GUIDE_VOCAL -> MTVEvent.VOCAL_CHANGE(3)
-                        DSData.PlayerFunc.PLAY -> MTVEvent.PLAY()
-                        DSData.PlayerFunc.PAUSE -> MTVEvent.PAUSE()
-                        DSData.PlayerFunc.CUT -> MTVEvent.CUT()
-                        DSData.PlayerFunc.REPLAY -> MTVEvent.REPLAY()
-                        DSData.PlayerFunc.NEXT -> null
-                        DSData.PlayerFunc.DONE -> null
-                        DSData.PlayerFunc.MUTE -> MTVEvent.MUTE_TOGGLE(true)
-                        DSData.PlayerFunc.UN_MUTE -> MTVEvent.MUTE_TOGGLE(false)
-                        DSData.PlayerFunc.FORCE_PAUSE -> null
-                        DSData.PlayerFunc.FORCE_PLAY -> null
+                    when (data.func) {
+                        DSData.PlayerFunc.ORIGINAL_VOCALS -> playerControlListener?.onVocalChanged(1)
+                        DSData.PlayerFunc.BACKING_VOCALS -> playerControlListener?.onVocalChanged(2)
+                        DSData.PlayerFunc.GUIDE_VOCAL -> playerControlListener?.onVocalChanged(3)
+                        DSData.PlayerFunc.PLAY -> playerControlListener?.onResume()
+                        DSData.PlayerFunc.PAUSE -> playerControlListener?.onPause()
+                        DSData.PlayerFunc.CUT -> playerControlListener?.onCut()
+                        DSData.PlayerFunc.REPLAY -> playerControlListener?.onReplay()
+                        DSData.PlayerFunc.MUTE -> playerControlListener?.onMuteToggle(true)
+                        DSData.PlayerFunc.UN_MUTE -> playerControlListener?.onMuteToggle(false)
+                        else -> {}
                     }
-                    mtvEvent.postValue(event)
                 }
                 RoomWifiService.Event.MEMBER_JOIN -> {
                     val data = dsData as StateData
@@ -433,7 +424,7 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
                                 String(mData.data ?: return@EventListener false)
                         }
                     }
-                    osdMessage.postValue(messageBundle)
+                    osdListener?.onOsdEvent(messageBundle)
                 }
                 else -> return@EventListener false
             }

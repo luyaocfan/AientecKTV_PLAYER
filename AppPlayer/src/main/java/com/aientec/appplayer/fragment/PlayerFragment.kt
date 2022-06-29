@@ -318,8 +318,8 @@ class PlayerFragment : Fragment() {
         val config: InePlayerController.InePlayerControllerConfigure =
             InePlayerController.InePlayerControllerConfigure().apply {
                 context = requireContext()
-                publicVideoView = binding.publicView
-                orderSongView = binding.playView
+//                publicVideoView = binding.publicView
+//                orderSongView = binding.playView
                 maxCacheCount = MAXIMUM_CACHE_COUNT
                 itemCacheSize = MAXIMUM_CACHE_SIZE
                 cacheBandwidthKBS = CACHE_BANDWIDTH_KBS

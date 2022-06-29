@@ -126,6 +126,7 @@ dependencies {
 
     implementation project(path: ':ComOsd')
     implementation project(path: ':ineplayer_1_1_13')
+    implementation(name: 'extension-ffmpeg-debug', ext: 'aar')
 //    implementation project(path: ':ModInePlayer')
 
 

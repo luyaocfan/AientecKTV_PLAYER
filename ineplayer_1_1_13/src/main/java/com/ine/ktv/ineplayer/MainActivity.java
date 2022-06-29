@@ -182,8 +182,8 @@ public class MainActivity extends AppCompatActivity implements InePlayerControll
 
         InePlayerController.InePlayerControllerConfigure config = new InePlayerController.InePlayerControllerConfigure();
         config.context = this;
-        config.orderSongView = orderSongView;
-        config.publicVideoView = publicVideoView;
+//        config.orderSongView = orderSongView;
+//        config.publicVideoView = publicVideoView;
         config.publicVideoPlayingBufferSize = PublicVideoPlayingBufferSize;
         config.maxCacheCount = MaxCacheCount;
         config.itemCacheSize = MaxCacheSize;

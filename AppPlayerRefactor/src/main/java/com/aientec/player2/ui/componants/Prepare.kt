@@ -3,6 +3,7 @@ package com.aientec.player2.ui.componants
 import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,19 +28,14 @@ fun Prepare(viewModel: PlayerViewModel = PlayerViewModel()) {
         viewModel.systemInit(mContext)
     }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = stringResource(id = R.string.state_prepare),
-            textAlign = TextAlign.Center,
-            color = Color.White,
-            fontSize = 84.sp
-        )
+    Surface(color = Color.Black) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = stringResource(id = R.string.state_prepare),
+                textAlign = TextAlign.Center,
+                color = Color.White,
+                fontSize = 84.sp
+            )
+        }
     }
-
-}
-
-@Composable
-@Preview
-fun PreparePreview() {
-    Prepare()
 }
