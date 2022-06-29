@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aientec.player2.data.MessageBundle
 import com.aientec.player2.data.PlayerControl
 import com.aientec.player2.model.PlayerModel
 import com.aientec.structure.Track
@@ -24,82 +25,209 @@ class PlayerViewModel : ViewModel() {
         const val PLAYER_STATE_REPLAY = 3
 
         private const val TAG = "PlayerViewModel"
+
+        private const val STATE_ICON_DISPLAY_TIME = 3000L
+
+        private const val NOTIFY_DISPLAY_TIME = 1000L
     }
 
-    private lateinit var model: PlayerModel
+    private lateinit var model : PlayerModel
 
-    val dataSyn: MutableLiveData<Boolean> = MutableLiveData(false)
+    val dataSyn : MutableLiveData<Boolean> = MutableLiveData(false)
 
-    val idleMTVList: MutableLiveData<List<Track>?> = MutableLiveData()
+    val idleMTVList : MutableLiveData<List<Track>?> = MutableLiveData()
 
-    val isIdle: MutableLiveData<Boolean> = MutableLiveData()
+    val isIdle : MutableLiveData<Boolean> = MutableLiveData()
 
-    val notifyMessage: MutableLiveData<String?> = MutableLiveData()
+    val notifyMessage : MutableLiveData<String?> = MutableLiveData()
 
-    val playerState: MutableLiveData<Int> = MutableLiveData()
+    val osdMessage : MutableLiveData<MessageBundle?> = MutableLiveData()
 
-    val isMute: MutableLiveData<Boolean> = MutableLiveData()
+    private var mPlayerState : Int = PLAYER_STATE_NONE
+        set(value) {
+            field = value
+            playerState.postValue(field)
+        }
+    val playerState : MutableLiveData<Int> = MutableLiveData()
 
-    val nextTrack: MutableLiveData<Track?> = MutableLiveData()
+    val isMute : MutableLiveData<Boolean> = MutableLiveData()
 
-    val playerControl: MutableLiveData<PlayerControl?> = MutableLiveData(null)
+    val ratingState : MutableLiveData<Int> = MutableLiveData()
 
-    fun systemInit(context: Context) {
+    private var mNextTrack : Track? = null
+        set(value) {
+            field = value
+            nextTrack.postValue(field)
+        }
+
+    val nextTrack : MutableLiveData<Track?> = MutableLiveData()
+
+    val playerControl : MutableLiveData<PlayerControl?> = MutableLiveData(null)
+
+    private var stateTimer : Timer? = null
+
+    private var notifyTimer : Timer? = null
+
+    private var ratingTimer : Timer? = null
+
+    fun systemInit(context : Context) {
         viewModelScope.launch {
             model = PlayerModel.getInstance(context)
 
             model.playerControlListener = playerControlListener
 
-            val res: Boolean = model.systemInitial()
+            model.addAudioUpdateListener(audioUpdateListener)
+
+            val res : Boolean = model.systemInitial()
+
+            idleMTVList.postValue(model.updateIdleTracks())
 
             dataSyn.postValue(res)
 
-            idleMTVList.postValue(model.updateIdleTracks())
         }
     }
 
-    fun onNextReq() {
+    fun nextTrackRequest() {
         viewModelScope.launch {
             Log.d(TAG, "OnNexReq")
             model.nextSongRequest()
         }
     }
 
-    fun onMTVTypeChanged(idle: Boolean) {
-        isIdle.postValue(idle)
+    fun onPlayerStart() {
+        viewModelScope.launch {
+            model.notifyPlayFn(8)
+            model.nextSongRequest()
+            isIdle.postValue(false)
+        }
+    }
+
+    fun onPlayerEnd() {
+        viewModelScope.launch {
+            if (mNextTrack == null)
+                model.notifyPlayFn(9)
+            isIdle.postValue(true)
+        }
     }
 
     fun onPlayerResume() {
-        playerState.postValue(PLAYER_STATE_RESUME)
-        disableState(1000L)
+        viewModelScope.launch {
+            updateState(PLAYER_STATE_RESUME, false)
+            model.notifyPlayFn(4)
+        }
     }
 
     fun onPlayerPause() {
-        playerState.postValue(PLAYER_STATE_PAUSE)
+        viewModelScope.launch {
+            updateState(PLAYER_STATE_PAUSE, true)
+            model.notifyPlayFn(5)
+        }
     }
 
     fun onPlayerCut() {
-        playerState.postValue(PLAYER_STATE_CUT)
-        disableState(1000L)
+        updateState(PLAYER_STATE_CUT, false)
     }
 
     fun onPlayerReplay() {
-        playerState.postValue(PLAYER_STATE_REPLAY)
-        disableState(1000L)
+        viewModelScope.launch {
+            updateState(PLAYER_STATE_REPLAY, true)
+            model.notifyPlayFn(7)
+        }
+
     }
 
-    private fun disableState(time: Long) {
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                playerState.postValue(PLAYER_STATE_NONE)
+    fun onPlayerMuteToggle(mute : Boolean) {
+        viewModelScope.launch {
+            isMute.postValue(mute)
+            model.notifyPlayFn(if (mute) 10 else 11)
+        }
+    }
+
+    fun onPlayerVocalChanged(type : Int) {
+        viewModelScope.launch {
+            when (type) {
+                1 -> updateNotifyMessage("原唱")
+                2 -> updateNotifyMessage("伴唱")
+                3 -> updateNotifyMessage("導唱")
             }
-        }, time)
+            model.notifyPlayFn(type)
+        }
     }
 
-    private val playerControlListener: PlayerModel.PlayerControlListener =
+    fun onPlayerRatingToggle(enable : Boolean) {
+        if (enable) {
+            ratingState.postValue(0)
+            ratingTimer = Timer().apply {
+                schedule(object : TimerTask() {
+                    override fun run() {
+                        ratingState.postValue(1)
+                    }
+                }, 3000)
+            }
+        } else {
+            ratingTimer?.cancel()
+            ratingState.postValue(-1)
+        }
+    }
+
+    private fun updateState(state : Int, keep : Boolean) {
+        mPlayerState = state
+
+        stateTimer?.cancel()
+
+        if (!keep) {
+            stateTimer = Timer().apply {
+                schedule(object : TimerTask() {
+                    override fun run() {
+                        playerState.postValue(PLAYER_STATE_NONE)
+                    }
+                }, STATE_ICON_DISPLAY_TIME)
+            }
+        }
+    }
+
+    private fun updateNotifyMessage(msg : String) {
+        notifyMessage.postValue(msg)
+
+        notifyTimer?.cancel()
+
+        notifyTimer = Timer().apply {
+            schedule(object : TimerTask() {
+                override fun run() {
+                    notifyMessage.postValue(null)
+                }
+            }, NOTIFY_DISPLAY_TIME)
+        }
+    }
+
+    private val audioUpdateListener : PlayerModel.AudioUpdateListener =
+        object : PlayerModel.AudioUpdateListener {
+            override fun onRecorderToggle(toggle : Boolean) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onMicVolumeChanged(value : Int) {
+                updateNotifyMessage("麥克風音量 : $value")
+            }
+
+            override fun onMusicVolumeChanged(value : Int) {
+                updateNotifyMessage("音樂音量 : $value")
+            }
+
+            override fun onEffectVolumeChanged(value : Int) {
+                updateNotifyMessage("回音音量 : $value")
+            }
+
+            override fun onToneChanged(value : Int) {
+                updateNotifyMessage("音調 : ${value - 7}")
+            }
+
+        }
+
+    private val playerControlListener : PlayerModel.PlayerControlListener =
         object : PlayerModel.PlayerControlListener {
-            override fun onAddTrack(track: Track?) {
-                nextTrack.postValue(track)
+            override fun onAddTrack(track : Track?) {
+                mNextTrack = track
             }
 
             override fun onResume() {
@@ -118,15 +246,15 @@ class PlayerViewModel : ViewModel() {
                 playerControl.postValue(PlayerControl.REPLAY)
             }
 
-            override fun onMuteToggle(mute: Boolean) {
+            override fun onMuteToggle(mute : Boolean) {
                 playerControl.postValue(PlayerControl.MUTE(mute))
             }
 
-            override fun onScoreToggle(enable: Boolean) {
-                playerControl.postValue(PlayerControl.SCORE(enable))
+            override fun onRatingToggle(enable : Boolean) {
+                playerControl.postValue(PlayerControl.RATING(enable))
             }
 
-            override fun onVocalChanged(type: Int) {
+            override fun onVocalChanged(type : Int) {
                 playerControl.postValue(PlayerControl.VOCAL(type))
             }
 

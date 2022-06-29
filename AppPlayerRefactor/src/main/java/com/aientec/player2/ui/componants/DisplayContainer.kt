@@ -28,17 +28,19 @@ import com.aientec.player2.ui.theme.AientecKTV_PLAYERTheme
 import com.aientec.player2.viewmodel.PlayerViewModel
 
 @Composable
-fun OsdContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
+fun DisplayContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (idle, notify, mute, state) = createRefs()
+        val (idle, notify, mute, state, rating) = createRefs()
 
-        val isIdle by viewModel.isIdle.observeAsState(initial = false)
+        val isIdle by viewModel.isIdle.observeAsState(initial = true)
 
-        val notifyMsg by viewModel.notifyMessage.observeAsState(initial = "null")
+        val notifyMsg by viewModel.notifyMessage.observeAsState(initial = null)
 
-        val isMute by viewModel.isMute.observeAsState(initial = true)
+        val isMute by viewModel.isMute.observeAsState(initial = false)
 
-        val playerState by viewModel.playerState.observeAsState(initial = 1)
+        val playerState by viewModel.playerState.observeAsState(initial = -1)
+
+        val ratingState by viewModel.ratingState.observeAsState(initial = -1)
 
         Text(
             text = "公播", fontSize = 48.sp, color = Color.White, modifier = Modifier
@@ -52,7 +54,6 @@ fun OsdContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
                 .padding(24.dp, 4.dp)
                 .alpha(if (isIdle) 1f else 0f)
         )
-
 
         Text(
             text = notifyMsg.toString(), fontSize = 48.sp, color = Color.White,
@@ -84,7 +85,7 @@ fun OsdContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
         }
 
         if (playerState != PlayerViewModel.PLAYER_STATE_NONE) {
-            val stateRes: Pair<Int, Int>? = when (playerState) {
+            val stateRes : Pair<Int, Int>? = when (playerState) {
                 PlayerViewModel.PLAYER_STATE_RESUME -> Pair(
                     R.drawable.ic_resume,
                     R.string.player_state_resume
@@ -124,13 +125,28 @@ fun OsdContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
                 )
             }
         }
+
+        if (ratingState != -1) {
+            Image(
+                painter = painterResource(if (ratingState == 0) R.drawable.img_start_score else R.drawable.img_on_score),
+                contentDescription = null,
+                modifier = Modifier
+                    .constrainAs(rating) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    }
+                    .fillMaxWidth(0.2f),
+                contentScale = ContentScale.FillWidth
+            )
+        }
     }
+
 }
 
 @Composable
 @Preview(backgroundColor = 0xFF000000L, device = Devices.AUTOMOTIVE_1024p)
 fun mPreview() {
     AientecKTV_PLAYERTheme {
-        OsdContainer()
+        DisplayContainer()
     }
 }

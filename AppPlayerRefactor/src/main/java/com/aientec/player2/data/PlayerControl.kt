@@ -6,6 +6,6 @@ sealed class PlayerControl {
     object CUT : PlayerControl()
     object REPLAY : PlayerControl()
     class MUTE(val mute: Boolean) : PlayerControl()
-    class SCORE(val enable: Boolean) : PlayerControl()
+    class RATING(val enable: Boolean) : PlayerControl()
     class VOCAL(val type: Int) : PlayerControl()
 }

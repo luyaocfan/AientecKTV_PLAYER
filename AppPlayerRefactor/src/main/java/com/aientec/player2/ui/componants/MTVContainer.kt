@@ -1,93 +1,71 @@
 package com.aientec.player2.ui.componants
 
 import android.content.Context
-import android.net.Uri
+import android.media.AudioManager
 import android.util.Log
 import android.view.SurfaceView
-import android.view.TextureView
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.LifecycleOwner
 import com.aientec.player2.BuildConfig
-import com.aientec.player2.R
 import com.aientec.player2.data.PlayerControl
 import com.aientec.player2.viewmodel.PlayerViewModel
 import com.aientec.structure.Track
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.IneStereoVolumeProcessor
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.ui.PlayerControlView
-import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.ine.ktv.playerengine.InePlayerController
 import java.util.*
 
-private val playList: List<String> = listOf(
+private val playList : List<String> = listOf(
     "https://www.hassen.myds.me/h265_60/CM100001_re.mp4",
     "https://www.hassen.myds.me/h265_60/CM100002_re.mp4",
     "https://www.hassen.myds.me/h265_60/CM100003_re.mp4",
     "https://www.hassen.myds.me/h265_60/CM100004_re.mp4"
 )
 
-const val MAXIMUM_CACHE_COUNT: Int = 4
+const val MAXIMUM_CACHE_COUNT : Int = 4
 
-const val MAXIMUM_CACHE_SIZE: Int = 1024 * 1024 * 16
+const val MAXIMUM_CACHE_SIZE : Int = 1024 * 1024 * 16
 
-const val PLAYING_BUFFER_SIZE: Int = MAXIMUM_CACHE_SIZE * 2
+const val PLAYING_BUFFER_SIZE : Int = MAXIMUM_CACHE_SIZE * 2
 
 val CACHE_BANDWIDTH_KBS = intArrayOf(4096, 1024, 512, 256)
 
-const val TAG: String = "MTVContainer"
+const val TAG : String = "MTVContainer"
 
 @Composable
-fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
+fun MTVContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
 
-    val mContext: Context = LocalContext.current
+    val mContext : Context = LocalContext.current
 
-    var controller: InePlayerController
+    val audioManager : AudioManager =
+        LocalContext.current.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-    val config: InePlayerController.InePlayerControllerConfigure =
+    var mController : InePlayerController? = null
+
+    val config : InePlayerController.InePlayerControllerConfigure =
         InePlayerController.InePlayerControllerConfigure().apply {
             this.context = mContext
             maxCacheCount = MAXIMUM_CACHE_COUNT
             itemCacheSize = MAXIMUM_CACHE_SIZE
             cacheBandwidthKBS = CACHE_BANDWIDTH_KBS
-            listener = object : InePlayerController.EventListen {
-
-            }
+            listener = InePlayerEventListener(viewModel)
         }
 
-    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner : LifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(key1 = mContext) {
 
-        controller = initPlayer(config)
+        mController = initPlayer(config)
+
+        val controller = mController ?: return@LaunchedEffect
 
         viewModel.idleMTVList.observe(lifecycleOwner) {
             if (it != null) {
@@ -104,23 +82,60 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
         viewModel.playerControl.observe(lifecycleOwner) {
             if (it != null) {
                 when (it) {
-                    PlayerControl.CUT -> controller.cut()
-                    is PlayerControl.MUTE -> {}
-                    PlayerControl.PAUSE -> controller.pause()
-                    PlayerControl.REPLAY -> controller.replay()
-                    PlayerControl.RESUME -> controller.pause()
+                    PlayerControl.CUT -> {
+                        if (!controller.isInPublicVideo) {
+                            controller.cut()
+                            viewModel.onPlayerCut()
+                        }
+                    }
+                    is PlayerControl.MUTE -> {
+                        audioManager.adjustStreamVolume(
+                            AudioManager.STREAM_MUSIC,
+                            if (it.mute) AudioManager.ADJUST_MUTE else AudioManager.ADJUST_UNMUTE,
+                            0
+                        )
+                        viewModel.onPlayerMuteToggle(it.mute)
+                    }
+                    PlayerControl.PAUSE -> {
+                        if (!controller.isPaused) {
+                            controller.pause()
+                            viewModel.onPlayerPause()
+                        }
+                    }
+                    PlayerControl.REPLAY -> {
+                        if (!controller.isInPublicVideo) {
+                            controller.replay()
+                            viewModel.onPlayerReplay()
+                        }
+                    }
+                    PlayerControl.RESUME -> {
+                        if (controller.isPaused) {
+                            controller.resume()
+                            viewModel.onPlayerResume()
+                        }
+                    }
                     is PlayerControl.VOCAL -> {
                         when (it.type) {
                             1 -> controller.AudioControlOutput(IneStereoVolumeProcessor.AudioControlOutput_LeftMono)
                             2 -> controller.AudioControlOutput(IneStereoVolumeProcessor.AudioControlOutput_RightMono)
                         }
+                        viewModel.onPlayerVocalChanged(it.type)
+                    }
+                    is PlayerControl.RATING ->{
+                        viewModel.onPlayerRatingToggle(it.enable)
                     }
                 }
             }
         }
 
-        viewModel.onNextReq()
+        viewModel.nextTrackRequest()
 
+    }
+
+    DisposableEffect(mContext) {
+        this.onDispose {
+            mController?.close()
+        }
     }
 
     AndroidView(
@@ -143,13 +158,13 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
             .background(Color.Transparent)
     )
 
-    OsdContainer(viewModel)
+    DisplayContainer(viewModel)
 
 }
 
 private fun updateIdleMtvList(
-    controller: InePlayerController,
-    list: List<Track>
+    controller : InePlayerController,
+    list : List<Track>
 ) {
     for (track in list) {
         Log.d("Trace", "updateIdleMtvList : ${track.name}")
@@ -162,7 +177,7 @@ private fun updateIdleMtvList(
     controller.open()
 }
 
-private fun updateOrderSong(controller: InePlayerController, track: Track) {
+private fun updateOrderSong(controller : InePlayerController, track : Track) {
     val playList = controller.GetOrderSongPlayList()
 
     Log.d(
@@ -186,9 +201,9 @@ private fun updateOrderSong(controller: InePlayerController, track: Track) {
     )
 }
 
-private fun initPlayer(configure: InePlayerController.InePlayerControllerConfigure): InePlayerController {
+private fun initPlayer(configure : InePlayerController.InePlayerControllerConfigure) : InePlayerController {
 
-    val controller: InePlayerController = InePlayerController(configure)
+    val controller : InePlayerController = InePlayerController(configure)
 
     controller.SetVODServerList(Array<String>(1) {
         BuildConfig.MTV_URL.replace("%s", "")
@@ -197,36 +212,53 @@ private fun initPlayer(configure: InePlayerController.InePlayerControllerConfigu
     return controller
 }
 
-private val eventListener:InePlayerController.EventListen = object :InePlayerController.EventListen{
-    override fun onPlayListChange(controller: InePlayerController?) {
+private class InePlayerEventListener(val viewModel : PlayerViewModel) :
+    InePlayerController.EventListen {
+    override fun onPlayListChange(controller : InePlayerController?) {
         super.onPlayListChange(controller)
     }
 
-    override fun onOrderSongFinish(controller: InePlayerController?) {
+    override fun onOrderSongFinish(controller : InePlayerController?) {
         super.onOrderSongFinish(controller)
     }
 
-    override fun onStop(controller: InePlayerController?, Name: String?, isPublicVideo: Boolean) {
+    override fun onStop(
+        controller : InePlayerController?,
+        Name : String?,
+        isPublicVideo : Boolean
+    ) {
         super.onStop(controller, Name, isPublicVideo)
+        if (!isPublicVideo)
+            viewModel.onPlayerEnd()
     }
 
-    override fun onNext(controller: InePlayerController?, Name: String?, isPublicVideo: Boolean) {
-
+    override fun onNext(
+        controller : InePlayerController?,
+        Name : String?,
+        isPublicVideo : Boolean
+    ) {
+        super.onNext(controller, Name, isPublicVideo)
+        if (!isPublicVideo)
+            viewModel.onPlayerStart()
     }
 
-    override fun onNextSongDisplay(controller: InePlayerController?, Name: String?) {
+    override fun onNextSongDisplay(controller : InePlayerController?, Name : String?) {
         super.onNextSongDisplay(controller, Name)
     }
 
-    override fun onLoadingError(controller: InePlayerController?, Name: String?) {
+    override fun onLoadingError(controller : InePlayerController?, Name : String?) {
         super.onLoadingError(controller, Name)
     }
 
-    override fun onPlayingError(controller: InePlayerController?, Name: String?, Message: String?) {
+    override fun onPlayingError(
+        controller : InePlayerController?,
+        Name : String?,
+        Message : String?
+    ) {
         super.onPlayingError(controller, Name, Message)
     }
 
-    override fun onAudioChannelMappingChanged(controller: InePlayerController?, type: Int) {
+    override fun onAudioChannelMappingChanged(controller : InePlayerController?, type : Int) {
         super.onAudioChannelMappingChanged(controller, type)
     }
 }

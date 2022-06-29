@@ -57,7 +57,7 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
         fun onCut()
         fun onReplay()
         fun onMuteToggle(mute: Boolean)
-        fun onScoreToggle(enable: Boolean)
+        fun onRatingToggle(enable: Boolean)
         fun onVocalChanged(type: Int)
     }
 
@@ -233,7 +233,7 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
                 }
                 RoomWifiService.Event.SCORE_TOGGLE -> {
                     val data = dsData as ScoreData
-                    playerControlListener?.onScoreToggle(data.toggle == DSData.Toggle.ON)
+                    playerControlListener?.onRatingToggle(data.toggle == DSData.Toggle.ON)
                 }
                 RoomWifiService.Event.DEBUG_LOG -> {
 
