@@ -43,6 +43,41 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+
+    productFlavors {
+        Oncor {
+            flavorDimensions 'model'
+            buildConfigField 'String', 'MTV_URL', "\"http://192.168.77.210/mtv/%s\""
+            buildConfigField 'String', 'DS_SEVER', "\"10.10.10.1:40051\""
+            buildConfigField 'String', 'FILE_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'PORTAL_SERVER', "\"http://192.168.77.200:10002/index.php/\""
+        }
+        Aien {
+            flavorDimensions 'model'
+            buildConfigField 'String', 'MTV_URL', "\"http://192.168.77.210/mtv/%s\""
+            buildConfigField 'String', 'DS_SEVER', "\"10.10.10.1:40051\""
+            buildConfigField 'String', 'FILE_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'PORTAL_SERVER', "\"http://192.168.77.220:10002/index.php/\""
+        }
+        Dev {
+            flavorDimensions 'model'
+            buildConfigField 'String', 'MTV_URL', "\"http://106.104.151.145:10011/mtv/%s\""
+            buildConfigField 'String', 'DS_SEVER', "\"106.104.151.145:40051\""
+            buildConfigField 'String', 'FILE_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'PORTAL_SERVER', "\"http:/106.104.151.145:10002/index.php/\""
+        }
+        hassen_local {
+            flavorDimensions 'model'
+            buildConfigField 'String', 'MTV_URL', "\"http://192.168.99.152/%s\""
+            buildConfigField 'String', 'DS_SEVER', "\"106.104.151.145:40051\""
+            buildConfigField 'String', 'FILE_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.77.200:10001/\""
+            buildConfigField 'String', 'PORTAL_SERVER', "\"http:/106.104.151.145:10002/index.php/\""
+        }
+    }
 }
 
 dependencies {
@@ -51,10 +86,18 @@ dependencies {
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
+    implementation "androidx.navigation:navigation-compose:2.4.2"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
     implementation 'androidx.activity:activity-compose:1.4.0'
 
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
+    implementation 'androidx.legacy:legacy-support-core-ui:1.0.0'
+
     implementation 'com.google.android.exoplayer:exoplayer-core:2.18.0'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    implementation 'com.linecorp:apng:1.11.0'
 
 //    implementation(name: 'core-0.0.1', ext: 'aar')
     implementation 'com.aientec.ktv:core:0.0.1'

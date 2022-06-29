@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">AppPlayerRefactor</string>
+    <string name="app_name">ONCOR_PLAYER</string>
+
+    <string name="state_prepare">系統準備中</string>
 </resources>
