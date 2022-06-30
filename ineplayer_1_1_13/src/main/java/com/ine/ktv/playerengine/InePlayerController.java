@@ -35,6 +35,7 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 
@@ -348,12 +349,14 @@ public class InePlayerController {
         orderSongPlayer.addListener(orderSongPlayerListener);
         config.orderSongView.setPlayer(orderSongPlayer);
 //        orderSongPlayer.setVideoSurfaceView(config.orderSongView);
+        orderSongPlayer.addAnalyticsListener(new EventLogger(null, "INE_PLAYER_ORDER"));
 
         publicVideoPlayer = new SimpleExoPlayer.Builder(this.config.context).build();
         publicVideoPlayer.addListener(publicVideoPlayerListener);
         publicVideoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
         config.publicVideoView.setPlayer(publicVideoPlayer);
 //        publicVideoPlayer.setVideoSurfaceView(config.publicVideoView);
+        publicVideoPlayer.addAnalyticsListener(new EventLogger(null, "INE_PLAYER_PUBLIC"));
 
         setCurrentPlayer(publicVideoPlayer);
 
