@@ -3,6 +3,7 @@ package com.aientec.player2
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -54,6 +55,12 @@ class MainActivity : ComponentActivity() {
                         navController.navigate("mtv")
                     else
                         navController.navigate("prepare")
+                }
+
+                viewModel.toastMsg.observe(this) {
+                    if (it != null) {
+                        Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+                    }
                 }
 
                 if (!connectState) {

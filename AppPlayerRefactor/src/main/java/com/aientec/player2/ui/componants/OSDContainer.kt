@@ -98,7 +98,7 @@ private fun OsdPicture(url: String) {
         contentScale = ContentScale.FillHeight,
         modifier = Modifier
             .fillMaxHeight(0.7f)
-            .rotate(rotate.toFloat() - 90f)
+            .rotate(rotate.toFloat() + 90f)
     )
 }
 
@@ -177,6 +177,6 @@ private fun getRotate(file: File): Int {
         )
     } catch (e: IOException) {
         Log.e("OSD", e.message.toString())
-        0
+        -90
     }
 }

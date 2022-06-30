@@ -37,7 +37,7 @@ private val playList: List<String> = listOf(
 
 const val MAXIMUM_CACHE_COUNT: Int = 4
 
-const val MAXIMUM_CACHE_SIZE: Int = 1024 * 1024 * 64
+const val MAXIMUM_CACHE_SIZE: Int = 1024 * 1024 * 16
 
 const val PLAYING_BUFFER_SIZE: Int = MAXIMUM_CACHE_SIZE * 2
 
@@ -182,7 +182,7 @@ private fun updateIdleMtvList(
         Log.d("Trace", "updateIdleMtvList : ${track.name}")
         controller.AddPubVideo(
             String.format(Locale.TAIWAN, BuildConfig.MTV_URL, track.fileName),
-            track.name
+            "${track.name}::${track.performer}::${track.sn}"
         )
     }
 
@@ -263,7 +263,55 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: Aud
         Log.e(TAG, "onNextSongDisplay : $Name")
     }
 
+    override fun onPlayListChange(controller: InePlayerController?, isPublicVideo: Boolean) {
+        super.onPlayListChange(controller, isPublicVideo)
+    }
 
+    override fun onLoadingError(
+        controller: InePlayerController?,
+        Name: String?,
+        isPublicVideo: Boolean
+    ) {
+        super.onLoadingError(controller, Name, isPublicVideo)
+        if(!isPublicVideo){
+
+        }
+    }
+
+    override fun onPlayingError(
+        controller: InePlayerController?,
+        Name: String?,
+        Message: String?,
+        isPublicVideo: Boolean
+    ) {
+        super.onPlayingError(controller, Name, Message, isPublicVideo)
+        viewModel.onToast("onPlayingError ${if(isPublicVideo) "公播" else "點播"} $Name : $Message")
+    }
+
+    override fun onRemovePrepareErrorOrderSong(
+        controller: InePlayerController?,
+        Name: String?,
+        url: String?
+    ) {
+        super.onRemovePrepareErrorOrderSong(controller, Name, url)
+        viewModel.onToast("onRemovePrepareErrorOrderSong $Name, $url")
+    }
+
+    override fun onRemovePrepareErrorPublicVideo(
+        controller: InePlayerController?,
+        Name: String?,
+        url: String?
+    ) {
+        super.onRemovePrepareErrorPublicVideo(controller, Name, url)
+        viewModel.onToast("onRemovePrepareErrorPublicVideo $Name, $url")
+    }
+
+    override fun onOrderSongAudioChannelMappingChanged(
+        controller: InePlayerController?,
+        type: Int
+    ) {
+        super.onOrderSongAudioChannelMappingChanged(controller, type)
+    }
 }
 
 private fun adjustAudioVolume(am: AudioManager, isIdle: Boolean) {

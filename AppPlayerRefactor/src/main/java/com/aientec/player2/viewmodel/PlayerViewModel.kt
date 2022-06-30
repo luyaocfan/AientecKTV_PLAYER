@@ -47,6 +47,8 @@ class PlayerViewModel : ViewModel() {
 
     val notifyMessage: MutableLiveData<String?> = MutableLiveData()
 
+    val nextDisplay: MutableLiveData<String?> = MutableLiveData()
+
     val osdMessage: MutableLiveData<MessageBundle?> = MutableLiveData()
 
     val isConnected: MutableLiveData<Boolean> = MutableLiveData()
@@ -63,6 +65,8 @@ class PlayerViewModel : ViewModel() {
     val isMute: MutableLiveData<Boolean> = MutableLiveData()
 
     val ratingState: MutableLiveData<Int> = MutableLiveData()
+
+    val toastMsg: MutableLiveData<String?> = MutableLiveData()
 
     private var mNextTrack: Track? = null
         set(value) {
@@ -221,6 +225,12 @@ class PlayerViewModel : ViewModel() {
     fun onOsdDone() {
         Log.d(TAG, "OnOsdDone")
         osdMessage.postValue(null)
+    }
+
+    fun onToast(msg: String) {
+        viewModelScope.launch {
+            toastMsg.postValue(msg)
+        }
     }
 
     private val audioUpdateListener: PlayerModel.AudioUpdateListener =
