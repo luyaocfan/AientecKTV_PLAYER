@@ -4,10 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <idv.bruce.ui.osd.container.OSDContainerView
-        android:id="@+id/osd"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+<!--    <idv.bruce.ui.osd.container.OSDContainerView-->
+<!--        android:id="@+id/osd"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent" />-->
 
     <TextView
         android:id="@+id/idle_tag"

@@ -37,7 +37,7 @@ private val playList: List<String> = listOf(
 
 const val MAXIMUM_CACHE_COUNT: Int = 4
 
-const val MAXIMUM_CACHE_SIZE: Int = 1024 * 1024 * 32
+const val MAXIMUM_CACHE_SIZE: Int = 1024 * 1024 * 64
 
 const val PLAYING_BUFFER_SIZE: Int = MAXIMUM_CACHE_SIZE * 2
 
@@ -170,7 +170,7 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
 //
 
 
-//    DisplayContainer(viewModel)
+    DisplayContainer(viewModel)
 }
 
 private fun updateIdleMtvList(

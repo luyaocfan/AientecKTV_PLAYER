@@ -80,7 +80,7 @@ class OsdFragment : Fragment() {
 
             osdViewModel.message?.let {
                   it.observe(viewLifecycleOwner) { bundle ->
-                        onMessageEvent(bundle)
+//                        onMessageEvent(bundle)
                   }
             }
 
@@ -107,115 +107,115 @@ class OsdFragment : Fragment() {
                         hideIdleTag()
             }
 
-            binding.osd.eventListener = object : OsdEventListener {
-                  override fun onDone(item: OSDItem) {
-                        Log.d(TAG, "OnOsdDne")
-                        if (item is OSDVideoItem)
-                              playerViewMode.onLocalPlay()
-                        item.release()
-                  }
-
-                  override fun onContainerReady() {
-                        showIdleTag()
-                  }
-
-                  override fun onContainerSizeChanged(width: Int, height: Int) {
-
-                  }
-            }
+//            binding.osd.eventListener = object : OsdEventListener {
+//                  override fun onDone(item: OSDItem) {
+//                        Log.d(TAG, "OnOsdDne")
+//                        if (item is OSDVideoItem)
+//                              playerViewMode.onLocalPlay()
+//                        item.release()
+//                  }
+//
+//                  override fun onContainerReady() {
+//                        showIdleTag()
+//                  }
+//
+//                  override fun onContainerSizeChanged(width: Int, height: Int) {
+//
+//                  }
+//            }
 
       }
 
       @SuppressLint("ResourceType")
-      private fun onMessageEvent(messageBundle: MessageBundle) {
-
-            val item: OSDItem? = when (messageBundle.type) {
-
-                  MessageBundle.Type.TEST -> {
-                        testFn()
-                  }
-                  MessageBundle.Type.TXT -> {
-                        OSDBarrageItem(
-                              " ${messageBundle.data as String}",
-                              OSDBarrageItem.Direction.RIGHT_TO_LEFT,
-                              2.0f,
-                              Color.WHITE,
-                              false,
-                              20000L,
-                              null,
-                              Pair(0.07f, 0.6f)
-                        )
-                  }
-                  MessageBundle.Type.IMAGE -> {
-                        OSDPictureItem(
-                              messageBundle.data as String, 5000, PointF(-1f, -1f),
-                              SizeF(0.5f, 0f)
-                        )
-                  }
-
-                  MessageBundle.Type.NONE -> {
-                        null
-                  }
-                  MessageBundle.Type.VIDEO -> {
-                        videoOsd = OSDVideoItem(
-                              requireContext(),
-                              messageBundle.data as String,
-                              PointF(-1f, -1f),
-                              SizeF(0f, 0.5f)
-                        )
-                        playerViewMode.onLocalPause()
-                        videoOsd
-//                if (videoOsd == null) {
-//                    videoOsd = OSDVideoItem(
-//                        requireContext(),
-//                        messageBundle.data as String,
-//                        PointF(-1f, -1f),
-//                        SizeF(0f, 0.5f)
-//                    )
-//                    playerViewMode.onLocalPause()
-//                    videoOsd
-//                } else {
-//                    videoQueue.push(
-//                        OSDVideoItem(
-//                            requireContext(),
-//                            messageBundle.data as String,
-//                            PointF(-1f, -1f),
-//                            SizeF(0f, 0.5f)
+//      private fun onMessageEvent(messageBundle: MessageBundle) {
+//
+//            val item: OSDItem? = when (messageBundle.type) {
+//
+//                  MessageBundle.Type.TEST -> {
+//                        testFn()
+//                  }
+//                  MessageBundle.Type.TXT -> {
+//                        OSDBarrageItem(
+//                              " ${messageBundle.data as String}",
+//                              OSDBarrageItem.Direction.RIGHT_TO_LEFT,
+//                              2.0f,
+//                              Color.WHITE,
+//                              false,
+//                              20000L,
+//                              null,
+//                              Pair(0.07f, 0.6f)
 //                        )
-//                    )
-//                    null
-//                }
-                  }
-                  MessageBundle.Type.EMOJI -> {
-                        animationOsd = OSDApngItem(
-                              messageBundle.data as ApngDrawable, 2,
-                              PointF(-1f, -1f), SizeF(0f, 0.7f)
-                        )
-                        animationOsd
-//                if (animationOsd == null) {
-//                    animationOsd = OSDApngItem(
-//                        messageBundle.data as ApngDrawable, 2,
-//                        PointF(-1f, -1f), SizeF(0f, 0.7f)
-//                    )
-//                    animationOsd
-//                } else {
-//                    animationQueue.push(
-//                        OSDApngItem(
-//                            messageBundle.data as ApngDrawable, 2,
-//                            PointF(-1f, -1f), SizeF(0f, 0.7f)
+//                  }
+//                  MessageBundle.Type.IMAGE -> {
+//                        OSDPictureItem(
+//                              messageBundle.data as String, 5000, PointF(-1f, -1f),
+//                              SizeF(0.5f, 0f)
 //                        )
-//                    )
-//                    null
-//                }
-                  }
-                  MessageBundle.Type.VOD -> {
-                        updateNotifyOsd(messageBundle.data.toString())
-                        null
-                  }
-            }
-
-            binding.osd.addOsdItem(item ?: return)
-      }
+//                  }
+//
+//                  MessageBundle.Type.NONE -> {
+//                        null
+//                  }
+//                  MessageBundle.Type.VIDEO -> {
+//                        videoOsd = OSDVideoItem(
+//                              requireContext(),
+//                              messageBundle.data as String,
+//                              PointF(-1f, -1f),
+//                              SizeF(0f, 0.5f)
+//                        )
+//                        playerViewMode.onLocalPause()
+//                        videoOsd
+////                if (videoOsd == null) {
+////                    videoOsd = OSDVideoItem(
+////                        requireContext(),
+////                        messageBundle.data as String,
+////                        PointF(-1f, -1f),
+////                        SizeF(0f, 0.5f)
+////                    )
+////                    playerViewMode.onLocalPause()
+////                    videoOsd
+////                } else {
+////                    videoQueue.push(
+////                        OSDVideoItem(
+////                            requireContext(),
+////                            messageBundle.data as String,
+////                            PointF(-1f, -1f),
+////                            SizeF(0f, 0.5f)
+////                        )
+////                    )
+////                    null
+////                }
+//                  }
+//                  MessageBundle.Type.EMOJI -> {
+//                        animationOsd = OSDApngItem(
+//                              messageBundle.data as ApngDrawable, 2,
+//                              PointF(-1f, -1f), SizeF(0f, 0.7f)
+//                        )
+//                        animationOsd
+////                if (animationOsd == null) {
+////                    animationOsd = OSDApngItem(
+////                        messageBundle.data as ApngDrawable, 2,
+////                        PointF(-1f, -1f), SizeF(0f, 0.7f)
+////                    )
+////                    animationOsd
+////                } else {
+////                    animationQueue.push(
+////                        OSDApngItem(
+////                            messageBundle.data as ApngDrawable, 2,
+////                            PointF(-1f, -1f), SizeF(0f, 0.7f)
+////                        )
+////                    )
+////                    null
+////                }
+//                  }
+//                  MessageBundle.Type.VOD -> {
+//                        updateNotifyOsd(messageBundle.data.toString())
+//                        null
+//                  }
+//            }
+//
+//            binding.osd.addOsdItem(item ?: return)
+//      }
 
       private fun onPlayerEvent(bundle: EventBundle) {
             Log.d(TAG, "OnEvent : ${bundle.event}")
@@ -305,7 +305,7 @@ class OsdFragment : Fragment() {
                   }
             }
 
-            binding.osd.addOsdItem(item ?: return)
+//            binding.osd.addOsdItem(item ?: return)
       }
 
 
@@ -381,7 +381,7 @@ class OsdFragment : Fragment() {
 
       private fun removeScore() {
             if (scoreTag != null) {
-                  binding.osd.removeOsdItem(scoreTag!!)
+//                  binding.osd.removeOsdItem(scoreTag!!)
                   scoreTag = null
             }
       }
@@ -400,7 +400,7 @@ class OsdFragment : Fragment() {
 
             playerViewMode.onLocalPause()
 
-            binding.osd.addOsdItem(item)
+//            binding.osd.addOsdItem(item)
       }
 
       private fun eventOnNextDisplay(track: Track) {
@@ -449,7 +449,7 @@ class OsdFragment : Fragment() {
                   Pair(0.07f, 0.6f)
             )
 
-            binding.osd.addOsdItem(item)
+//            binding.osd.addOsdItem(item)
       }
 
       private fun showIdleTag() {
@@ -526,7 +526,7 @@ class OsdFragment : Fragment() {
 
       private fun removeStatusOsd() {
             if (statusOsd != null) {
-                  binding.osd.removeOsdItem(statusOsd!!)
+//                  binding.osd.removeOsdItem(statusOsd!!)
                   statusOsd = null
             }
       }

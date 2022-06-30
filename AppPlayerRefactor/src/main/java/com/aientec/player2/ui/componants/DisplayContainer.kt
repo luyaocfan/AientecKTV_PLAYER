@@ -32,7 +32,7 @@ fun DisplayContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
 //    OSDContainer(viewModel = viewModel)
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (idle, notify, mute, state, rating) = createRefs()
+        val (idle, notify, mute, state, rating, next) = createRefs()
 
         val isIdle by viewModel.isIdle.observeAsState(initial = true)
 
@@ -140,6 +140,12 @@ fun DisplayContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
                     .fillMaxWidth(0.2f),
                 contentScale = ContentScale.FillWidth
             )
+        }
+
+        Column(modifier = Modifier.constrainAs(next) {
+
+        }.background(Color.Blue).fillMaxWidth(0.2f), horizontalAlignment = Alignment.CenterHorizontally) {
+
         }
     }
 
