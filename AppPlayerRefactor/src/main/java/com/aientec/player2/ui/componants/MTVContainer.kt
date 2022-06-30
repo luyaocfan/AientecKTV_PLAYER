@@ -81,6 +81,13 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
             }
         }
 
+        viewModel.isRoomOpened.observe(lifecycleOwner) {
+            if (it) {
+                resetPlayer(controller)
+                viewModel.nextTrackRequest()
+            }
+        }
+
         viewModel.nextTrack.observe(lifecycleOwner) {
             if (it != null) {
                 updateOrderSong(controller, it)
@@ -224,6 +231,12 @@ private fun initPlayer(configure: InePlayerController.InePlayerControllerConfigu
     return controller
 }
 
+private fun resetPlayer(controller: InePlayerController) {
+    for (i in 1 until controller.GetOrderSongPlayList().size)
+        controller.DeleteOrderSong(i)
+    controller.cut()
+}
+
 private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: AudioManager) :
     InePlayerController.EventListen {
 
@@ -273,7 +286,7 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: Aud
         isPublicVideo: Boolean
     ) {
         super.onLoadingError(controller, Name, isPublicVideo)
-        if(!isPublicVideo){
+        if (!isPublicVideo) {
 
         }
     }
@@ -285,7 +298,7 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: Aud
         isPublicVideo: Boolean
     ) {
         super.onPlayingError(controller, Name, Message, isPublicVideo)
-        viewModel.onToast("onPlayingError ${if(isPublicVideo) "公播" else "點播"} $Name : $Message")
+        viewModel.onToast("onPlayingError ${if (isPublicVideo) "公播" else "點播"} $Name : $Message")
     }
 
     override fun onRemovePrepareErrorOrderSong(

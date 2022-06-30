@@ -10,8 +10,8 @@ android {
         applicationId "com.aientec.player2"
         minSdkVersion 25
         targetSdkVersion 32
-        versionCode 8
-        versionName "0.0.8"
+        versionCode 9
+        versionName "0.0.9"
         project.archivesBaseName = "PLAYER_REFACTOR_DUAL_VIEW_${defaultConfig.versionName}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
