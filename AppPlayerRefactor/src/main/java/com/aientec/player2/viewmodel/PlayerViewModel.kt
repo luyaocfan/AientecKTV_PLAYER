@@ -218,6 +218,10 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
+    fun onOsdDone() {
+        osdMessage.postValue(null)
+    }
+
     private val audioUpdateListener: PlayerModel.AudioUpdateListener =
         object : PlayerModel.AudioUpdateListener {
             override fun onRecorderToggle(toggle: Boolean) {
@@ -257,7 +261,6 @@ class PlayerViewModel : ViewModel() {
             }
 
             override fun onCut() {
-//                _test()
                 playerControl.postValue(PlayerControl.CUT)
             }
 
@@ -299,10 +302,7 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
-    fun _test(){
-        osdMessage.postValue(MessageBundle().apply {
-            this.data = "1233456789"
-            this.type = MessageBundle.Type.TXT
-        })
+    fun _test() {
+        model._test()
     }
 }

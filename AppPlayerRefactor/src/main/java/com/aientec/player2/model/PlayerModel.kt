@@ -355,4 +355,12 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
             return@EventListener true
         }
 
+    fun _test() {
+
+        val messageBundle: MessageBundle = MessageBundle()
+        messageBundle.type = MessageBundle.Type.VIDEO
+        messageBundle.data = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+
+        osdListener?.onOsdEvent(messageBundle)
+    }
 }
