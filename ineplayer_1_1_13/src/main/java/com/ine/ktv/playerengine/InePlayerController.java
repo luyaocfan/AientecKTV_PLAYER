@@ -644,9 +644,10 @@ public class InePlayerController {
                     mediaSource = orderSongs.get(orderSongIdx);
                     mediaSource.dataSource.changeCacheSpeed(config.cacheBandwidthKBS[i]);
                 }
-                config.listener.onNext(this, orderSongs.get(0).SongName, false);
-                if (orderSongs.size() > 1)
-                    config.listener.onNextSongDisplay(this, orderSongs.get(1).SongName);
+                config.listener.onNextSongDisplay(this, orderSongs.get(0).SongName);
+//                config.listener.onNext(this, orderSongs.get(0).SongName, false);
+//                if (orderSongs.size() > 1)
+//                    config.listener.onNextSongDisplay(this, orderSongs.get(1).SongName);
                 setCurrentPlayer(publicVideoPlayer);
             } else {
 
@@ -702,7 +703,7 @@ public class InePlayerController {
                     endOfOrderSong = false;
                     setAudioOutput(audioControlOutputMode);
                     setCurrentPlayer(orderSongPlayer);
-                    config.listener.onNext(this, orderSongs.get(0).SongName, false);
+                    //config.listener.onNext(this, orderSongs.get(0).SongName, false);
                     if (orderSongs.size() > 1)
                         config.listener.onNextSongDisplay(this, orderSongs.get(1).SongName);
                 }
@@ -885,8 +886,8 @@ public class InePlayerController {
 //        orderSongPlayer.setVideoSurfaceView(config.display);
         orderSongClearMediaItems++;
         //setParameters();
-
-        //setParameters();
+        if(orderSongs.size() > 0)
+            config.listener.onNext(this, orderSongs.get(0).SongName, false);
         orderSongPlayer.play();
         currentPlayer = orderSongPlayer;
 

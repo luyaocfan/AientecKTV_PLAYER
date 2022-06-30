@@ -1,5 +1,6 @@
 rootProject.name = "AientecKTV_PLAYER"
 include ':AppPlayer'
+include ':AppPlayerRefactor'
 include ':ComOsd'
 include ':ineplayer_1_1_13'
 include ':AppPlayerRefactor'
