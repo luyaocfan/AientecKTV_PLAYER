@@ -50,6 +50,8 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
     val audioManager: AudioManager =
         LocalContext.current.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
+    adjustAudioVolume(audioManager, true)
+
     var mController: InePlayerController? = null
 
     val config: InePlayerController.InePlayerControllerConfigure =
@@ -65,7 +67,7 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
 
     LaunchedEffect(key1 = mContext) {
 
-        adjustAudioVolume(audioManager, true)
+
 
         mController = initPlayer(config)
 
