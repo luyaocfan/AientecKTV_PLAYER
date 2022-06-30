@@ -61,20 +61,22 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
         fun onVocalChanged(type: Int)
     }
 
+    interface RoomStateChangeListener {
+        fun onNetworkConnectionChanged(connected: Boolean)
+        fun onRoomOpenStateChanged(opened: Boolean)
+    }
+
     interface OsdListener {
         fun onOsdEvent(messageBundle: MessageBundle)
     }
-
 
     private val portalService: PortalService2 = PortalService2.getInstance(context)
 
     private val wifiService: RoomWifiService = RoomWifiService.getInstance(context)
 
-    val connectionState: MutableLiveData<Boolean> = MutableLiveData()
-
-    val openState: MutableLiveData<Boolean> = MutableLiveData()
-
     var playerControlListener: PlayerControlListener? = null
+
+    var roomStateChangeListener: RoomStateChangeListener? = null
 
     var osdListener: OsdListener? = null
 
@@ -83,30 +85,18 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
     val mContext: Context
         get() = contextRef.get()!!
 
-    private val onlineMemberMap: HashMap<Int, User> = HashMap()
-
-//      private var playingList: ArrayList<Track>? = null
-
-//    private val room: Room = Room(BuildConfig.ROOM_ID)
-
     private val remoteFile: String = "${BuildConfig.IMG_ROOT}%s"
-
 
     private val audioUpdateListenerList: ArrayList<AudioUpdateListener> = ArrayList()
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
 
-    private lateinit var userImgFilePath: File
-
     private fun init() {
-
 
         PortalService2.apiRoot = BuildConfig.PORTAL_SERVER
 
         portalService.init()
-
-        onlineMemberMap.clear()
 
         val dsIp: String = BuildConfig.DS_SEVER.split(":")[0]
 
@@ -138,23 +128,20 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
     }
 
 
-    suspend fun systemInitial(): Boolean = withContext(Dispatchers.IO) {
+    suspend fun systemInitial(): Boolean = withContext(coroutineContext) {
         return@withContext connectDataServer()
     }
 
 
-    private suspend fun connectDataServer(): Boolean = withContext(Dispatchers.IO) {
+    private suspend fun connectDataServer(): Boolean = withContext(coroutineContext) {
         val isConnected = wifiService.connect()
         if (isConnected)
             return@withContext wifiService.registerDeviceType(RegisterData.ClientType.PLAYER)
         return@withContext wifiService.connect()
     }
 
-    private fun getUserById(id: Int): User? {
-        return onlineMemberMap.values.find { it.id == id }
-    }
 
-    suspend fun updateIdleTracks(): List<Track>? = withContext(Dispatchers.IO) {
+    suspend fun updateIdleTracks(): List<Track>? = withContext(coroutineContext) {
         val response: PortalResponse = portalService.Store.getAdsTrackList()
 
         return@withContext when (response) {
@@ -188,46 +175,22 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
         wifiService.nextSongRequest()
     }
 
-    private fun downloadPicture(user: User) {
-        val url: String = user.icon
-        if (url.isEmpty()) return
-
-        val file: File = File(userImgFilePath, "${user.id}.tmp")
-
-        val connection: HttpURLConnection = (URL(url).openConnection()) as HttpURLConnection
-
-        connection.connect()
-
-        val inputStream: InputStream = connection.inputStream
-
-        val outputStream: FileOutputStream = FileOutputStream(file)
-
-        inputStream.copyTo(outputStream)
-
-        inputStream.close()
-
-        outputStream.close()
-
-        file.renameTo(File(userImgFilePath, "${user.id}.jpg"))
-
-    }
-
     private val listener: RoomWifiService.EventListener =
         RoomWifiService.EventListener { event, dsData ->
             when (event) {
                 RoomWifiService.Event.ROOM_SWITCH -> {
-                    openState.postValue((dsData as RoomSwitchData).switch)
+                    roomStateChangeListener?.onRoomOpenStateChanged((dsData as RoomSwitchData).switch)
                 }
                 RoomWifiService.Event.ON_CONNECTED -> {
-                    connectionState.postValue(true)
+                    roomStateChangeListener?.onNetworkConnectionChanged(true)
                 }
                 RoomWifiService.Event.ON_DISCONNECTED -> {
-                    connectionState.postValue(false)
+                    roomStateChangeListener?.onNetworkConnectionChanged(false)
                 }
                 RoomWifiService.Event.ON_RECONNECTED -> {
                     launch(coroutineContext) {
                         wifiService.registerDeviceType(RegisterData.ClientType.PLAYER)
-                        connectionState.postValue(true)
+                        roomStateChangeListener?.onNetworkConnectionChanged(true)
                         wifiService.nextSongRequest()
                     }
                 }
@@ -272,32 +235,6 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
                         else -> {}
                     }
                 }
-                RoomWifiService.Event.MEMBER_JOIN -> {
-                    val data = dsData as StateData
-
-                    when (data.state) {
-                        StateData.State.NONE -> return@EventListener false
-                        StateData.State.OFFLINE -> {
-                            onlineMemberMap.values.removeIf {
-                                it.token == data.token
-                            }
-                        }
-                        StateData.State.ONLINE -> {
-                            val portalResponse: PortalResponse =
-                                portalService.Store.getUserInfo(
-                                    data.token ?: return@EventListener false
-                                )
-
-                            when (portalResponse) {
-                                is PortalResponse.Success -> {
-                                    val user: User = portalResponse.data as User
-                                    onlineMemberMap[user.id] = user
-                                    downloadPicture(user)
-                                }
-                            }
-                        }
-                    }
-                }
                 RoomWifiService.Event.VOICE_CTRL -> {
                     val mData: VoiceData = dsData as VoiceData
 
@@ -332,20 +269,8 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
                 RoomWifiService.Event.VOD_TMS_CTRL -> {
                     val mData = dsData as TmsData
 
-                    val user: User? = getUserById(mData.id.toInt())
+                    val messageBundle: MessageBundle = MessageBundle()
 
-                    val messageBundle: MessageBundle = MessageBundle().apply {
-                        sender = user?.name ?: "未知"
-                        senderIcon = if (user != null) {
-                            val file: File = File(userImgFilePath, "${user!!.id}.jpg")
-                            if (file.exists())
-                                file.absolutePath
-                            else
-                                null
-                        } else {
-                            null
-                        }
-                    }
                     when (mData.type) {
                         TmsData.Type.NONE -> return@EventListener false
                         TmsData.Type.TEXT -> {
@@ -400,7 +325,6 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
                             }
                         }
                         TmsData.Type.VIDEO -> {
-
                             messageBundle.type = MessageBundle.Type.VIDEO
                             messageBundle.data = String.format(
                                 Locale.TAIWAN,

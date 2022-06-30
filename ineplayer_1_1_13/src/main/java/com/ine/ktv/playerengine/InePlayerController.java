@@ -52,7 +52,7 @@ public class InePlayerController {
         public Context context;
         public SurfaceView orderSongView, publicVideoView;
         public int maxCacheCount = 4;
-        public int itemCacheSize = 1024 * 1024 * 4;
+        public int itemCacheSize = 1024 * 1024 * 2;
         public int[] cacheBandwidthKBS = new int[]{512, 256, 128, 64};
         public int publicVideoPlayingBufferSize = 1024 * 1024 * 32;
         public EventListen listener;

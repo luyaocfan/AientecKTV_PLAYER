@@ -23,34 +23,34 @@ import com.google.android.exoplayer2.audio.IneStereoVolumeProcessor
 import com.ine.ktv.playerengine.InePlayerController
 import java.util.*
 
-private val playList : List<String> = listOf(
+private val playList: List<String> = listOf(
     "https://www.hassen.myds.me/h265_60/CM100001_re.mp4",
     "https://www.hassen.myds.me/h265_60/CM100002_re.mp4",
     "https://www.hassen.myds.me/h265_60/CM100003_re.mp4",
     "https://www.hassen.myds.me/h265_60/CM100004_re.mp4"
 )
 
-const val MAXIMUM_CACHE_COUNT : Int = 4
+const val MAXIMUM_CACHE_COUNT: Int = 4
 
-const val MAXIMUM_CACHE_SIZE : Int = 1024 * 1024 * 16
+const val MAXIMUM_CACHE_SIZE: Int = 1024 * 1024 * 16
 
-const val PLAYING_BUFFER_SIZE : Int = MAXIMUM_CACHE_SIZE * 2
+const val PLAYING_BUFFER_SIZE: Int = MAXIMUM_CACHE_SIZE * 2
 
 val CACHE_BANDWIDTH_KBS = intArrayOf(4096, 1024, 512, 256)
 
-const val TAG : String = "MTVContainer"
+const val TAG: String = "MTVContainer"
 
 @Composable
-fun MTVContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
+fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
 
-    val mContext : Context = LocalContext.current
+    val mContext: Context = LocalContext.current
 
-    val audioManager : AudioManager =
+    val audioManager: AudioManager =
         LocalContext.current.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-    var mController : InePlayerController? = null
+    var mController: InePlayerController? = null
 
-    val config : InePlayerController.InePlayerControllerConfigure =
+    val config: InePlayerController.InePlayerControllerConfigure =
         InePlayerController.InePlayerControllerConfigure().apply {
             this.context = mContext
             maxCacheCount = MAXIMUM_CACHE_COUNT
@@ -59,7 +59,7 @@ fun MTVContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
             listener = InePlayerEventListener(viewModel)
         }
 
-    val lifecycleOwner : LifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(key1 = mContext) {
 
@@ -121,7 +121,7 @@ fun MTVContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
                         }
                         viewModel.onPlayerVocalChanged(it.type)
                     }
-                    is PlayerControl.RATING ->{
+                    is PlayerControl.RATING -> {
                         viewModel.onPlayerRatingToggle(it.enable)
                     }
                 }
@@ -163,8 +163,8 @@ fun MTVContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
 }
 
 private fun updateIdleMtvList(
-    controller : InePlayerController,
-    list : List<Track>
+    controller: InePlayerController,
+    list: List<Track>
 ) {
     for (track in list) {
         Log.d("Trace", "updateIdleMtvList : ${track.name}")
@@ -177,7 +177,7 @@ private fun updateIdleMtvList(
     controller.open()
 }
 
-private fun updateOrderSong(controller : InePlayerController, track : Track) {
+private fun updateOrderSong(controller: InePlayerController, track: Track) {
     val playList = controller.GetOrderSongPlayList()
 
     Log.d(
@@ -201,9 +201,9 @@ private fun updateOrderSong(controller : InePlayerController, track : Track) {
     )
 }
 
-private fun initPlayer(configure : InePlayerController.InePlayerControllerConfigure) : InePlayerController {
+private fun initPlayer(configure: InePlayerController.InePlayerControllerConfigure): InePlayerController {
 
-    val controller : InePlayerController = InePlayerController(configure)
+    val controller: InePlayerController = InePlayerController(configure)
 
     controller.SetVODServerList(Array<String>(1) {
         BuildConfig.MTV_URL.replace("%s", "")
@@ -212,53 +212,59 @@ private fun initPlayer(configure : InePlayerController.InePlayerControllerConfig
     return controller
 }
 
-private class InePlayerEventListener(val viewModel : PlayerViewModel) :
+private class InePlayerEventListener(val viewModel: PlayerViewModel) :
     InePlayerController.EventListen {
-    override fun onPlayListChange(controller : InePlayerController?) {
+    override fun onPlayListChange(controller: InePlayerController?) {
         super.onPlayListChange(controller)
     }
 
-    override fun onOrderSongFinish(controller : InePlayerController?) {
+    override fun onOrderSongFinish(controller: InePlayerController?) {
         super.onOrderSongFinish(controller)
     }
 
     override fun onStop(
-        controller : InePlayerController?,
-        Name : String?,
-        isPublicVideo : Boolean
+        controller: InePlayerController?,
+        Name: String?,
+        isPublicVideo: Boolean
     ) {
         super.onStop(controller, Name, isPublicVideo)
+        Log.e(TAG, "onStop : $Name, $isPublicVideo")
         if (!isPublicVideo)
             viewModel.onPlayerEnd()
     }
 
     override fun onNext(
-        controller : InePlayerController?,
-        Name : String?,
-        isPublicVideo : Boolean
+        controller: InePlayerController?,
+        Name: String?,
+        isPublicVideo: Boolean
     ) {
         super.onNext(controller, Name, isPublicVideo)
+        Log.e(TAG, "onNext : $Name, $isPublicVideo")
         if (!isPublicVideo)
             viewModel.onPlayerStart()
     }
 
-    override fun onNextSongDisplay(controller : InePlayerController?, Name : String?) {
+    override fun onNextSongDisplay(controller: InePlayerController?, Name: String?) {
         super.onNextSongDisplay(controller, Name)
+        Log.e(TAG, "onNextSongDisplay : $Name")
     }
 
-    override fun onLoadingError(controller : InePlayerController?, Name : String?) {
+    override fun onLoadingError(controller: InePlayerController?, Name: String?) {
         super.onLoadingError(controller, Name)
+        Log.e(TAG, "onLoadingError : $Name")
     }
 
     override fun onPlayingError(
-        controller : InePlayerController?,
-        Name : String?,
-        Message : String?
+        controller: InePlayerController?,
+        Name: String?,
+        Message: String?
     ) {
         super.onPlayingError(controller, Name, Message)
+        Log.e(TAG, "onPlayingError : $Name, $Message")
     }
 
-    override fun onAudioChannelMappingChanged(controller : InePlayerController?, type : Int) {
+    override fun onAudioChannelMappingChanged(controller: InePlayerController?, type: Int) {
         super.onAudioChannelMappingChanged(controller, type)
+        Log.e(TAG, "onAudioChannelMappingChanged : $type")
     }
 }

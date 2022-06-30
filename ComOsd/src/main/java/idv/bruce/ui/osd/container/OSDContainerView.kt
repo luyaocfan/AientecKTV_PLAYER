@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
-class OSDContainerView(context: Context, attr: AttributeSet) : View(context, attr),
+class OSDContainerView(context: Context, attr: AttributeSet? = null) : View(context, attr),
     Choreographer.FrameCallback, OsdContainer {
     companion object {
         const val TAG: String = "OSD_Container"
@@ -53,6 +53,8 @@ class OSDContainerView(context: Context, attr: AttributeSet) : View(context, att
     private var debugThread: ExecutorService = Executors.newSingleThreadExecutor()
 
     private var mLastTimeNanos: Long = -1L
+
+    private var workerThread: ExecutorService = Executors.newSingleThreadExecutor()
 
     init {
         (context as LifecycleOwner).apply {

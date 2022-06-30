@@ -111,6 +111,7 @@ dependencies {
     implementation 'com.aientec.ktv:iot:0.0.5'
 
     implementation project(path: ':ineplayer_1_1_13')
+    implementation project(path: ':ComOsd')
 //    implementation(name: 'extension-ffmpeg-debug', ext: 'aar')
 
 

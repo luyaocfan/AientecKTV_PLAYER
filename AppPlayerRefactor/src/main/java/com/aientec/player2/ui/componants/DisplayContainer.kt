@@ -141,6 +141,7 @@ fun DisplayContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
         }
     }
 
+//    OSDContainer(viewModel = viewModel)
 }
 
 @Composable
