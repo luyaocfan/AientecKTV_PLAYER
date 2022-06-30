@@ -219,6 +219,7 @@ class PlayerViewModel : ViewModel() {
     }
 
     fun onOsdDone() {
+        Log.d(TAG, "OnOsdDone")
         osdMessage.postValue(null)
     }
 

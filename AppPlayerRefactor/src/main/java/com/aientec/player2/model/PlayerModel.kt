@@ -357,9 +357,15 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
 
     fun _test() {
 
+//        val inputStream: InputStream =
+//            mContext.assets.open("anime/elephant.gif")
+//
+//        val apngDrawable: ApngDrawable =
+//            ApngDrawable.Companion.decode(inputStream)
+
         val messageBundle: MessageBundle = MessageBundle()
         messageBundle.type = MessageBundle.Type.VIDEO
-        messageBundle.data = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+        messageBundle.data = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
 
         osdListener?.onOsdEvent(messageBundle)
     }

@@ -80,36 +80,6 @@ fun OSDContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
             }
         }
     }
-
-//    AndroidView(factory = {
-//        OSDContainerView(it).apply {
-//            viewModel.osdMessage.observe(mLifecycleOwner) { msg ->
-//                if (msg != null) {
-//                    when (msg.type) {
-//                        MessageBundle.Type.TXT -> {
-//                            addOsdItem(
-//                                OSDBarrageItem(
-//                                    " ${msg.data as String}",
-//                                    OSDBarrageItem.Direction.RIGHT_TO_LEFT,
-//                                    2.0f,
-//                                    Color.WHITE,
-//                                    false,
-//                                    20000L,
-//                                    null,
-//                                    Pair(0.07f, 0.6f)
-//                                )
-//                            )
-//                        }
-//                        MessageBundle.Type.IMAGE -> {}
-//                        MessageBundle.Type.VIDEO -> {}
-//                        MessageBundle.Type.EMOJI -> {}
-//                        MessageBundle.Type.VOD -> {}
-//                        else -> {}
-//                    }
-//                }
-//            }
-//        }
-//    }, modifier = Modifier.fillMaxSize())
 }
 
 @Composable
@@ -128,7 +98,7 @@ private fun OsdPicture(url: String) {
         contentScale = ContentScale.FillHeight,
         modifier = Modifier
             .fillMaxHeight(0.7f)
-            .rotate(rotate.toFloat())
+            .rotate(rotate.toFloat() - 90f)
     )
 }
 
@@ -178,18 +148,13 @@ private fun OsdVideo(url: String, onDone: () -> Unit) {
 
                 player.playWhenReady = true
 
-                player.addAnalyticsListener(EventLogger(null, "OSD_VIDEO"))
-
                 player.addListener(object : Player.Listener {
-                    override fun onPlayerError(error: ExoPlaybackException) {
-                        super.onPlayerError(error)
-                        onDone()
-                    }
-
                     override fun onPlaybackStateChanged(state: Int) {
                         super.onPlaybackStateChanged(state)
-                        if (state == ExoPlayer.STATE_ENDED)
-                            onDone
+                        if (state == ExoPlayer.STATE_ENDED) {
+                            player.release()
+                            onDone()
+                        }
                     }
                 })
 

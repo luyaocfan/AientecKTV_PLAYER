@@ -97,6 +97,7 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
                         }
                     }
                     is PlayerControl.MUTE -> {
+
                         audioManager.adjustStreamVolume(
                             AudioManager.STREAM_MUSIC,
                             if (it.mute) AudioManager.ADJUST_MUTE else AudioManager.ADJUST_UNMUTE,
@@ -266,9 +267,17 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: Aud
 }
 
 private fun adjustAudioVolume(am: AudioManager, isIdle: Boolean) {
+    val isMute = am.isStreamMute(AudioManager.STREAM_MUSIC)
+
     val maxVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
 
     val volume: Int = if (isIdle) (0.5f * maxVolume.toFloat()).toInt() else maxVolume
 
     am.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
+
+    am.adjustStreamVolume(
+        AudioManager.STREAM_MUSIC,
+        if (isMute) AudioManager.ADJUST_MUTE else AudioManager.ADJUST_UNMUTE,
+        0
+    )
 }
