@@ -145,22 +145,22 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
     AndroidView(
         factory = {
             SurfaceView(it).apply {
-                config.orderSongView = this
+                config.display = this
             }
         }, modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent)
     )
-
-    AndroidView(
-        factory = {
-            SurfaceView(it).apply {
-                config.publicVideoView = this
-            }
-        }, modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Transparent)
-    )
+//
+//    AndroidView(
+//        factory = {
+//            SurfaceView(it).apply {
+//                config.publicVideoView = this
+//            }
+//        }, modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color.Transparent)
+//    )
 
     DisplayContainer(viewModel)
 }
