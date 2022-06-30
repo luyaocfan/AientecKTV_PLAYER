@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.aientec.appplayer.data.EventBundle
 import com.aientec.appplayer.data.MTVEvent
+import com.aientec.appplayer.data.MessageBundle
 import com.aientec.appplayer.model.Repository
 import com.aientec.ktv_wifiap.commands.DSData
 import com.aientec.ktv_wifiap.commands.PlayerData
@@ -26,6 +27,20 @@ class PlayerViewModel : ViewModelImpl() {
       lateinit var openState: LiveData<Boolean>
 
       private var isMute: Boolean = false
+
+      //begin OSD
+      var message: MutableLiveData<MessageBundle>? = null
+
+      var marque: MutableLiveData<String>? = null
+
+      val barrageMessage: MutableLiveData<String> = MutableLiveData()
+
+      val notifyMassage: MutableLiveData<String> = MutableLiveData()
+
+      //val nextTrack: MutableLiveData<Track> = MutableLiveData()
+
+      val isPublish: MutableLiveData<Boolean> = MutableLiveData()
+      //end OSD
 
       override fun onRepositoryAttach(repo: Repository) {
             super.onRepositoryAttach(repo)
@@ -59,6 +74,32 @@ class PlayerViewModel : ViewModelImpl() {
 
                   }
             })
+
+            //begin OSD
+            message = repo.osdMessage
+            repo.addAudioUpdateListener(object : Repository.AudioUpdateListener {
+                  override fun onRecorderToggle(toggle: Boolean) {
+
+                  }
+
+                  override fun onMicVolumeChanged(value: Int) {
+                        notifyMassage.postValue("麥克風音量 : $value")
+                  }
+
+                  override fun onMusicVolumeChanged(value: Int) {
+                        notifyMassage.postValue("音樂音量 : $value")
+                  }
+
+                  override fun onEffectVolumeChanged(value: Int) {
+                        notifyMassage.postValue("回音音量 : $value")
+                  }
+
+                  override fun onToneChanged(value: Int) {
+                        notifyMassage.postValue("音調 : ${value-7}")
+                  }
+            })
+            //end OSD
+
       }
 
       fun onReady() {
@@ -198,4 +239,26 @@ class PlayerViewModel : ViewModelImpl() {
                   scoreMode.postValue(enable)
             }
       }
+      //begin OSD
+      fun onNotify(msg: String) {
+            notifyMassage.postValue(msg)
+      }
+
+      fun test() {
+            val bundle = MessageBundle().also {
+                  it.senderIcon = null
+                  it.data = "Test"
+                  it.type = MessageBundle.Type.TXT
+                  it.sender = "dd"
+            }
+            message?.postValue(bundle)
+//        barrageMessage.postValue("Test : 123456")
+      }
+
+      fun onTypeChanged(isPub: Boolean) {
+            viewModelScope.launch {
+                  isPublish.postValue(isPub)
+            }
+      }
+      //end OSD
 }
