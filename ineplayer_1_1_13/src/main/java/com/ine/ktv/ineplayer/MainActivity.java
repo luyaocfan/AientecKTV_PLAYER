@@ -445,11 +445,11 @@ public class MainActivity extends AppCompatActivity implements InePlayerControll
     }
     //OnPlayerControllerEventListen
     @Override
-    public void onPlayListChange(InePlayerController controller) {
+    public void onPlayListChange(InePlayerController controller,boolean isPublicVideo) {
 
         String[] NewList = controller.GetOrderSongPlayList();
         StringBuilder sb = new StringBuilder();
-        if(controller.isInPublicVideo()) {
+        if(isPublicVideo) {
             sb.append("公播\n");
         }
         for(int i=0;i<NewList.length;i++){
@@ -500,21 +500,21 @@ public class MainActivity extends AppCompatActivity implements InePlayerControll
         Log.d("下一首", Name);
     };
     @Override
-    public void onLoadingError(InePlayerController controller, String Name) {
+    public void onLoadingError(InePlayerController controller, String Name, boolean isPublicVideo) {
         SampleOSD.UpdateData data = new SampleOSD.UpdateData();
         data.type = OSDBase.UpdateData.Type_LoadingError;
         data.message = Name;
         sampleOSD.onUpdate(data);
     };
     @Override
-    public void onPlayingError(InePlayerController controller, String Name, String message) {
+    public void onPlayingError(InePlayerController controller, String Name, String message, boolean isPublicVideo) {
         SampleOSD.UpdateData data = new SampleOSD.UpdateData();
         data.type = OSDBase.UpdateData.Type_PlayingError;
         data.message = Name+" "+message;
         sampleOSD.onUpdate(data);
     };
     @Override
-    public void onAudioChannelMappingChanged(InePlayerController controller, int type) {
+    public void onOrderSongAudioChannelMappingChanged(InePlayerController controller, int type) {
         SampleOSD.UpdateData data = new SampleOSD.UpdateData();
         data.type = (!controller.isInPublicVideo() && type == IneStereoVolumeProcessor.AudioControlOutput_LeftMono)?OSDBase.UpdateData.Type_AudioOriginal:OSDBase.UpdateData.Type_AudioMusic;
         sampleOSD.onUpdate(data);

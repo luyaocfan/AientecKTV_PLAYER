@@ -6,7 +6,6 @@ import android.media.MediaCodecList;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.SurfaceView;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -28,6 +27,7 @@ import com.google.android.exoplayer2.source.IneDataSource;
 import com.google.android.exoplayer2.source.IneMediaSource;
 import com.google.android.exoplayer2.source.LoadEventInfo;
 import com.google.android.exoplayer2.source.MediaLoadData;
+import com.google.android.exoplayer2.source.MediaPeriodId;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.TrackGroup;
@@ -51,45 +51,40 @@ public class InePlayerController {
     static public class InePlayerControllerConfigure {
         public Context context;
         public PlayerView orderSongView, publicVideoView;
-//        public SurfaceView display;
         public int maxCacheCount = 4;
-        public int itemCacheSize = 1024 * 1024 * 4;
-        public int[] cacheBandwidthKBS = new int[]{512, 256, 128, 64};
-        public int publicVideoPlayingBufferSize = 1024 * 1024 * 32;
+        public int itemCacheSize = 1024*1024*4;
+        public int[] cacheBandwidthKBS = new int[] {512,256,128,64};
+        public int publicVideoPlayingBufferSize = 1024*1024*32;
         public EventListen listener;
 
-        public InePlayerControllerConfigure clone() {
+        public InePlayerControllerConfigure clone(){
             InePlayerControllerConfigure newConfig = new InePlayerControllerConfigure();
             newConfig.context = this.context;
             newConfig.orderSongView = this.orderSongView;
             newConfig.publicVideoView = this.publicVideoView;
-//            newConfig.display = this.display;
             newConfig.maxCacheCount = this.maxCacheCount;
             newConfig.itemCacheSize = this.itemCacheSize;
-            newConfig.cacheBandwidthKBS = new int[this.cacheBandwidthKBS.length];
+            newConfig.cacheBandwidthKBS = new int [this.cacheBandwidthKBS.length];
             newConfig.publicVideoPlayingBufferSize = this.publicVideoPlayingBufferSize;
-            System.arraycopy(this.cacheBandwidthKBS, 0, newConfig.cacheBandwidthKBS, 0, this.cacheBandwidthKBS.length);
+            System.arraycopy(this.cacheBandwidthKBS,0, newConfig.cacheBandwidthKBS, 0,this.cacheBandwidthKBS.length);
             newConfig.listener = this.listener;
             return newConfig;
         }
-    }
-
-    ;
-
-    private class cOrderSongPlayerListener implements SimpleExoPlayer.Listener, MediaSourceEventListener, IneStereoVolumeProcessor.Listener, IneDataSource.Listener {
+    };
+    private class cOrderSongPlayerListener implements SimpleExoPlayer.Listener, MediaSourceEventListener, IneStereoVolumeProcessor.Listener, IneDataSource.Listener{
         // Player.Listener
         @Override
         public void onPlaybackStateChanged(int state) {
-            if (state == SimpleExoPlayer.STATE_READY) {
+            if(state == SimpleExoPlayer.STATE_READY) {
                 showTracks();
-                if (needSwitchSurface) {
+                if(needSwitchSurface) {
                     needSwitchSurface = false;
                     switchToOrderSongPlayer();
                 }
                 onOrderSongReady();
             }
-            if (state == ExoPlayer.STATE_ENDED) {
-                if (orderSongClearMediaItems > 0) {
+            if(state == ExoPlayer.STATE_ENDED) {
+                if(orderSongClearMediaItems > 0) {
                     orderSongClearMediaItems--;
                     return;
                 }
@@ -99,24 +94,24 @@ public class InePlayerController {
         }
 
         @Override
-        public void onMediaItemTransition(@Nullable MediaItem mediaItem, @Player.MediaItemTransitionReason int reason) {
+        public void onMediaItemTransition(@Nullable MediaItem mediaItem, @Player.MediaItemTransitionReason int reason){
             if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO)
                 stop();
         }
-
         @Override
         public void onPlayerError(ExoPlaybackException error) {
             int state = orderSongPlayer.getPlaybackState();
             if (state == Player.STATE_IDLE || state == Player.STATE_BUFFERING) {
                 if (Looper.myLooper() == Looper.getMainLooper())
-                    onOrderSongLoadError();
+                    onOrderSongLoadError(error.mediaPeriodId);
                 else
-                    handler.post(() -> onOrderSongLoadError());
-            } else {
+                    handler.post(() -> onOrderSongLoadError(error.mediaPeriodId));
+            }
+            else {
                 if (Looper.myLooper() == Looper.getMainLooper())
-                    onOrderSongPlayError();
+                    onOrderSongPlayerError(error.mediaPeriodId);
                 else
-                    handler.post(() -> onOrderSongPlayError());
+                    handler.post(() -> onOrderSongPlayerError(error.mediaPeriodId));
             }
         }
 //  MediaSourceEventListener
@@ -129,19 +124,20 @@ public class InePlayerController {
                                 IOException error,
                                 boolean wasCanceled) {
             {
-                if (!(error instanceof EOFException)) {
+                if(!(error instanceof EOFException)) {
                     error.printStackTrace();
                     int state = orderSongPlayer.getPlaybackState();
                     if (state == Player.STATE_IDLE || state == Player.STATE_BUFFERING) {
                         if (Looper.myLooper() == Looper.getMainLooper())
-                            onOrderSongLoadError();
+                            onOrderSongLoadError(mediaPeriodId);
                         else
-                            handler.post(() -> onOrderSongLoadError());
-                    } else {
+                            handler.post(() -> onOrderSongLoadError(mediaPeriodId));
+                    }
+                    else {
                         if (Looper.myLooper() == Looper.getMainLooper())
-                            onOrderSongPlayError();
+                            onOrderSongPlayerError(mediaPeriodId);
                         else
-                            handler.post(() -> onOrderSongPlayError());
+                            handler.post(() -> onOrderSongPlayerError(mediaPeriodId));
                     }
                 }
 
@@ -158,43 +154,38 @@ public class InePlayerController {
         public void onFormatError(IneStereoVolumeProcessor process, AudioProcessor.AudioFormat audioformat, String message) {
             final String localMessage = message;
             if (Looper.myLooper() == Looper.getMainLooper())
-                onOrderSongPlayMessage(localMessage);
+                onOrderSongPlayErrorMessage(localMessage);
             else
-                handler.post(() -> onOrderSongPlayMessage(localMessage));
+                handler.post(() -> onOrderSongPlayErrorMessage(localMessage));
 
         }
-
         // IneDataSource.Listener
         @Override
         public void OnIneDataSourceError(int errorType, String url, String message) {
 
         }
-    }
-
-    ;
-
-    private class cPublicVideoPlayerListener implements SimpleExoPlayer.Listener, MediaSourceEventListener, IneDataSource.Listener {
+    };
+    private class cPublicVideoPlayerListener implements SimpleExoPlayer.Listener, MediaSourceEventListener, IneDataSource.Listener{
         // SimpleExoPlayer.Listener
         @Override
         public void onPlaybackStateChanged(int state) {
-            if (state == SimpleExoPlayer.STATE_READY) {
-                if (PublicVideoPlayWhenReady) {
+            if(state == SimpleExoPlayer.STATE_READY) {
+                if(PublicVideoPlayWhenReady) {
                     PublicVideoPlayWhenReady = false;
                     publicVideoPlayer.play();
                 }
                 onPublicVideoReady();
             }
-            if (state == SimpleExoPlayer.STATE_ENDED) {
+            if(state == SimpleExoPlayer.STATE_ENDED) {
             }
         }
-
         @Override
-        public void onMediaItemTransition(@Nullable MediaItem mediaItem, @Player.MediaItemTransitionReason int reason) {
+        public void onMediaItemTransition(@Nullable MediaItem mediaItem, @Player.MediaItemTransitionReason int reason){
             if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
                 int publicVideoIdx = publicVideoPlayer.getCurrentWindowIndex();
                 if (currentPlayer == publicVideoPlayer) {
-                    if (publicVideos.size() - 1 == publicVideoIdx) {
-                        if (publicVideoPlayerHadError) {
+                    if(publicVideos.size() - 1 == publicVideoIdx) {
+                        if(publicVideoPlayerHadError) {
                             publicVideoPlayerHadError = false;
                             publicVideoPlayer.clearMediaItems();
                             for (int i = 0; i < publicVideos.size(); i++) {
@@ -203,27 +194,27 @@ public class InePlayerController {
                         }
                         onPublicVideoEnd();
                     }
-                    if (publicVideos.size() > publicVideoIdx)
+                    if( publicVideos.size() > publicVideoIdx )
                         config.listener.onStop(that, publicVideos.get(publicVideoIdx).SongName, true);
                     else
                         config.listener.onStop(that, "Unknown", true);
                 }
             }
         }
-
         @Override
         public void onPlayerError(ExoPlaybackException error) {
             int state = publicVideoPlayer.getPlaybackState();
             if (state == Player.STATE_IDLE || state == Player.STATE_BUFFERING) {
                 if (Looper.myLooper() == Looper.getMainLooper())
-                    onPublicVideoLoadError();
+                    onPublicVideoLoadError(error.mediaPeriodId);
                 else
-                    handler.post(() -> onPublicVideoLoadError());
-            } else {
+                    handler.post(() -> onPublicVideoLoadError(error.mediaPeriodId));
+            }
+            else {
                 if (Looper.myLooper() == Looper.getMainLooper())
-                    onPublicVideoPlayError();
+                    onPublicVideoPlayerError(error.mediaPeriodId);
                 else
-                    handler.post(() -> onPublicVideoPlayError());
+                    handler.post(() -> onPublicVideoPlayerError(error.mediaPeriodId));
             }
         }
 //  MediaSourceEventListener
@@ -236,33 +227,31 @@ public class InePlayerController {
                                 IOException error,
                                 boolean wasCanceled) {
             {
-                if (!(error instanceof EOFException)) {
+                if(!(error instanceof EOFException)) {
                     error.printStackTrace();
                     int state = publicVideoPlayer.getPlaybackState();
                     if (state == Player.STATE_IDLE || state == Player.STATE_BUFFERING) {
                         if (Looper.myLooper() == Looper.getMainLooper())
-                            onPublicVideoLoadError();
+                            onPublicVideoLoadError(mediaPeriodId);
                         else
-                            handler.post(() -> onPublicVideoLoadError());
-                    } else {
+                            handler.post(() -> onPublicVideoLoadError(mediaPeriodId));
+                    }
+                    else {
                         if (Looper.myLooper() == Looper.getMainLooper())
-                            onPublicVideoPlayError();
+                            onPublicVideoPlayerError(mediaPeriodId);
                         else
-                            handler.post(() -> onPublicVideoPlayError());
+                            handler.post(() -> onPublicVideoPlayerError(mediaPeriodId));
                     }
                 }
 
             }
         }
-
         // IneDataSource.Listener
         @Override
         public void OnIneDataSourceError(int errorType, String url, String message) {
 
         }
-    }
-
-    ;
+    };
     private InePlayerController that = this;
     private SimpleExoPlayer currentPlayer = null, orderSongPlayer, publicVideoPlayer;
     private cOrderSongPlayerListener orderSongPlayerListener = new cOrderSongPlayerListener();
@@ -291,45 +280,17 @@ public class InePlayerController {
     private InePlayerControllerConfigure config;
 
     public interface EventListen {
-        default void onPlayListChange(InePlayerController controller) {
-        }
-
-        ;
-
-        default void onOrderSongFinish(InePlayerController controller) {
-        }
-
-        ;
-
-        default void onStop(InePlayerController controller, String Name, boolean isPublicVideo) {
-        }
-
-        ;
-
-        default void onNext(InePlayerController controller, String Name, boolean isPublicVideo) {
-        }
-
-        ;
-
-        default void onNextSongDisplay(InePlayerController controller, String Name) {
-        }
-
-        default void onLoadingError(InePlayerController controller, String Name) {
-        }
-
-        ;
-
-        default void onPlayingError(InePlayerController controller, String Name, String Message) {
-        }
-
-        ;
-
-        default void onAudioChannelMappingChanged(InePlayerController controller, int type) {
-        }
-
-        ;
+        default void onPlayListChange(InePlayerController controller, boolean isPublicVideo) {};
+        default void onOrderSongFinish(InePlayerController controller) {};
+        default void onStop(InePlayerController controller, String Name, boolean isPublicVideo) {};
+        default void onNext(InePlayerController controller, String Name, boolean isPublicVideo) {};
+        default void onNextSongDisplay(InePlayerController controller, String Name) {}
+        default void onLoadingError(InePlayerController controller, String Name, boolean isPublicVideo) {};
+        default void onPlayingError(InePlayerController controller, String Name, String Message, boolean isPublicVideo) {};
+        default void onRemovePrepareErrorOrderSong(InePlayerController controller, String Name, String url) {};
+        default void onRemovePrepareErrorPublicVideo(InePlayerController controller, String Name, String url) {};
+        default void onOrderSongAudioChannelMappingChanged(InePlayerController controller, int type) {};
     }
-
     public InePlayerController(InePlayerControllerConfigure config) {
         this.config = config.clone();
 
@@ -338,77 +299,70 @@ public class InePlayerController {
 
         stereoVolumeProcessor = new IneStereoVolumeProcessor(orderSongPlayerListener);
         trackSelector = new DefaultTrackSelector(this.config.context);
-        IneRenderersFactory factory = new IneRenderersFactory(this.config.context, stereoVolumeProcessor);
-        factory.setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
+        IneRenderersFactory ineRenderersFactory = new IneRenderersFactory(this.config.context, stereoVolumeProcessor);
+        ineRenderersFactory.setExtensionRendererMode( DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
 
-        orderSongPlayer = new SimpleExoPlayer.Builder(this.config.context, factory)
+        orderSongPlayer = new SimpleExoPlayer.Builder(this.config.context, ineRenderersFactory)
                 .setTrackSelector(trackSelector)
                 .build();
-//        showCodecs();
+        showCodecs();
         orderSongPlayer.addListener(orderSongPlayerListener);
         config.orderSongView.setPlayer(orderSongPlayer);
-//        orderSongPlayer.setVideoSurfaceView(config.orderSongView);
-
-        publicVideoPlayer = new SimpleExoPlayer.Builder(this.config.context).build();
+        DefaultRenderersFactory defaultRenderersFactory = new DefaultRenderersFactory(this.config.context);
+        defaultRenderersFactory.setExtensionRendererMode( DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
+        publicVideoPlayer = new SimpleExoPlayer.Builder(this.config.context, defaultRenderersFactory).build();
         publicVideoPlayer.addListener(publicVideoPlayerListener);
         publicVideoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
         config.publicVideoView.setPlayer(publicVideoPlayer);
-//        publicVideoPlayer.setVideoSurfaceView(config.publicVideoView);
 
         setCurrentPlayer(publicVideoPlayer);
 
         dataSourceFactory = new IneDataSource.Factory().setUserAgent(Util.getUserAgent(this.config.context, "InePlayer"));
     }
-
     public void showCodecs() {
         //com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
         MediaCodecList androidCodecs = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
         for (MediaCodecInfo codecInfo : androidCodecs.getCodecInfos()) {
             Log.d("codec", codecInfo.getName() + " " + Arrays.toString(codecInfo.getSupportedTypes()));
         }
-        Log.d("codec", "ffmpeg support ac3 : " + ((FfmpegLibrary.supportsFormat(MimeTypes.AUDIO_AC3)) ? "true" : "false"));
+        Log.d("codec","ffmpeg support ac3 : "+(( FfmpegLibrary.supportsFormat(MimeTypes.AUDIO_AC3))?"true":"false"));
     }
-
-    public String[] GetVODServerList() {
+    public String[] GetVODServerList(){
         return IneDataSource.VODServerBaseUrl;
     }
-
-    public void SetVODServerList(String[] VODServerList) {
+    public void SetVODServerList(String[] VODServerList){
         IneDataSource.VODServerBaseUrl = VODServerList;
         IneDataSource.VODServerIndex = 0;
     }
-
-    public void SetVODServerToNext() {
+    public void SetVODServerToNext(){
         int idx = IneDataSource.VODServerIndex;
         idx++;
-        if (idx >= IneDataSource.VODServerBaseUrl.length)
+        if(idx >= IneDataSource.VODServerBaseUrl.length)
             idx = 0;
         IneDataSource.VODServerIndex = idx;
     }
-
     public void AddOrderSong(String url, String name, int playingBufferSize) {
         String targetUrl;
-        if (url.startsWith("http"))
+        if(url.startsWith("http"))
             targetUrl = url;
         else
             targetUrl = IneDataSource.VODReplaceSign + url;
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            handler.post(() -> AddOrderSong(targetUrl, name, playingBufferSize));
+        if(Looper.myLooper() != Looper.getMainLooper()) {
+            handler.post(()->AddOrderSong(targetUrl, name, playingBufferSize));
             return;
         }
 
 
         InsertOrderSong(orderSongs.size(), targetUrl, name, playingBufferSize);
     }
-
     public void InsertOrderSong(int index, String url, String name, int playingBufferSize) {
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            handler.post(() -> InsertOrderSong(index, url, name, playingBufferSize));
+        if(Looper.myLooper() != Looper.getMainLooper()) {
+            handler.post(()->InsertOrderSong(index, url, name, playingBufferSize));
             return;
         }
 
         String targetUrl;
-        if (url.startsWith("http"))
+        if(url.startsWith("http"))
             targetUrl = url;
         else
             targetUrl = IneDataSource.VODReplaceSign + url;
@@ -421,22 +375,22 @@ public class InePlayerController {
         orderSongs.add(index, mediaSource);
         orderSongPlayer.addMediaSource(index, mediaSource);
         //orderSongPlayer.prepare();
-        if (cacheCount < config.maxCacheCount) {
+        if(cacheCount < config.maxCacheCount) {
             mediaSource.dataSource.startCacheBuffer(config.itemCacheSize, config.cacheBandwidthKBS[cacheCount]);
             cacheCount++;
         }
-        PlayListChange();
+        PlayListChange(false);
     }
 
     public void AddPubVideo(String url, String name) {
 
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            handler.post(() -> AddPubVideo(url, name));
+        if(Looper.myLooper() != Looper.getMainLooper()) {
+            handler.post(()->AddPubVideo(url, name));
             return;
         }
 
         String targetUrl;
-        if (url.startsWith("http"))
+        if(url.startsWith("http"))
             targetUrl = url;
         else
             targetUrl = IneDataSource.VODReplaceSign + url;
@@ -447,19 +401,18 @@ public class InePlayerController {
         mediaSource.dataSource.listener = publicVideoPlayerListener;
         mediaSource.SongName = name;
         publicVideos.add(mediaSource);
-        PlayListChange();
+        PlayListChange(true);
     }
-
-    public void SetPubVideos(String urls[], String names[]) {
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            handler.post(() -> SetPubVideos(urls, names));
+    public void SetPubVideos(String urls[],String names[]) {
+        if(Looper.myLooper() != Looper.getMainLooper()) {
+            handler.post(()->SetPubVideos(urls, names));
             return;
         }
         publicVideoPlayer.clearMediaItems();
-        for (int i = 0; i < urls.length; i++) {
+        for(int i=0; i<urls.length; i++) {
 
             String targetUrl;
-            if (urls[i].startsWith("http"))
+            if(urls[i].startsWith("http"))
                 targetUrl = urls[i];
             else
                 targetUrl = IneDataSource.VODReplaceSign + urls[i];
@@ -470,66 +423,60 @@ public class InePlayerController {
             mediaSource.SongName = names[i];
             publicVideos.add(mediaSource);
         }
-        PlayListChange();
+        PlayListChange(true);
     }
 
     //    public void SelectPubVideo(int index) {
 //    }
     public void DeleteOrderSong(int index) {
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            handler.post(() -> DeleteOrderSong(index));
+        if(Looper.myLooper() != Looper.getMainLooper()) {
+            handler.post(()->DeleteOrderSong(index));
             return;
         }
-        if (index < orderSongs.size()) {
+        if(index < orderSongs.size()) {
             IneMediaSource mediaSource = orderSongs.get(index);
             orderSongPlayer.removeMediaItem(index);
-            if (mediaSource.dataSource.CacheStatus != IneDataSource.CacheStatus_NoCache)
+            if(mediaSource.dataSource.CacheStatus!=IneDataSource.CacheStatus_NoCache)
                 cacheCount--;
             orderSongs.get(index).dataSource.freeCacheBuffer();
             orderSongs.remove(index);
-            PlayListChange();
+            PlayListChange(false);
         }
     }
-
     public String[] GetOrderSongPlayList() {
         ArrayList<String> list = new ArrayList<>();
-        for (int i = 0; i < orderSongs.size(); i++)
+        for(int i = 0; i < orderSongs.size(); i++)
             list.add(orderSongs.get(i).SongName);
 
         String[] listArray = new String[list.size()];
         listArray = list.toArray(listArray);
         return listArray;
     }
-
     public String[] GetPublicVideoPlayList() {
         ArrayList<String> list = new ArrayList<>();
-        for (int i = 0; i < orderSongs.size(); i++)
+        for(int i = 0; i < orderSongs.size(); i++)
             list.add(orderSongs.get(i).SongName);
         String[] listArray = new String[list.size()];
         listArray = list.toArray(listArray);
         return listArray;
     }
-
     public void AudioControlOutput(int type) {
         audioControlOutputMode = type;
-        if (currentPlayer == orderSongPlayer) {
+        if(currentPlayer == orderSongPlayer){
             setAudioOutput(type);
         }
     }
-
     public boolean isInPublicVideo() {
         return (currentPlayer == publicVideoPlayer);
     }
-
     public void open() {
-        for (int i = 0; i < publicVideos.size(); i++) {
+        for(int i = 0; i < publicVideos.size(); i++) {
             publicVideoPlayer.addMediaSource(publicVideos.get(i));
         }
         setCurrentPlayer(publicVideoPlayer);
         publicVideoPlayer.prepare();
         checkOrderSong();
     }
-
     public void close() {
         handler.removeCallbacks(checkOrderSongLoop);
         orderSongPlayer.stop();
@@ -540,60 +487,55 @@ public class InePlayerController {
         orderSongs.clear();
         publicVideos.clear();
     }
-
     public boolean isPaused() {
         return Paused;
     }
-
     public void pause() {
-        if (currentPlayer == orderSongPlayer && !Paused) {
+        if(currentPlayer == orderSongPlayer && !Paused) {
             orderSongPlayer.pause();
             Paused = true;
         }
     }
-
     public void resume() {
-        if (currentPlayer == orderSongPlayer && Paused) {
+        if(currentPlayer == orderSongPlayer && Paused) {
             setCurrentPlayer(orderSongPlayer);
             orderSongPlayer.play();
             Paused = false;
         }
     }
-
     public void replay() {
-        if (currentPlayer == orderSongPlayer) {
+        if(currentPlayer == orderSongPlayer) {
             resume();
             orderSongPlayer.seekTo(orderSongPlayer.getCurrentWindowIndex(), C.TIME_UNSET);
         }
     }
-
     public void play() {
-        if (orderSongs.size() > 0) {
+        if(orderSongs.size()>0) {
             setCurrentPlayer(orderSongPlayer);
             if (!Paused)
-                PlayListChange();
+                PlayListChange(false);
             else
                 Paused = false;
         }
         //else if(publicVideos.size()>0)
     }
-
     public void publicVideoNext() {
-        if (currentPlayer == publicVideoPlayer) {
+        if(currentPlayer == publicVideoPlayer) {
             int publicVideoIdx = publicVideoPlayer.getCurrentWindowIndex();
             publicVideoPlayerIdleCount = 0;
-            if (publicVideos.size() > publicVideoIdx)
+            if(publicVideos.size() > publicVideoIdx)
                 config.listener.onStop(this, publicVideos.get(publicVideoIdx).SongName, true);
             else
                 config.listener.onStop(this, "Unknown", true);
-            if (publicVideoPlayer.hasNext()) {
+            if(publicVideoPlayer.hasNext()) {
                 publicVideoPlayer.next();
-                if (publicVideos.size() > publicVideoIdx + 1)
-                    config.listener.onNext(this, publicVideos.get(publicVideoIdx + 1).SongName, true);
+                if(publicVideos.size() > publicVideoIdx+1)
+                    config.listener.onNext(this, publicVideos.get(publicVideoIdx+1).SongName, true);
                 else
                     config.listener.onStop(this, "Unknown", true);
-            } else {
-                if (publicVideoPlayerHadError) {
+            }
+            else {
+                if(publicVideoPlayerHadError) {
                     publicVideoPlayerHadError = false;
                     publicVideoPlayer.clearMediaItems();
                     for (int i = 0; i < publicVideos.size(); i++) {
@@ -601,7 +543,7 @@ public class InePlayerController {
                     }
                 }
                 publicVideoPlayer.seekToDefaultPosition(0);
-                if (publicVideos.size() > 0)
+                if(publicVideos.size() > 0)
                     config.listener.onNext(this, publicVideos.get(0).SongName, true);
                 else
                     config.listener.onStop(this, "Unknown", true);
@@ -610,37 +552,37 @@ public class InePlayerController {
     }
 
     public void stop() {
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            handler.post(() -> stop());
+        if(Looper.myLooper() != Looper.getMainLooper()) {
+            handler.post(()->stop());
             return;
         }
         Paused = false;
         orderSongPlayerIdleCount = 0;
 
-        if (currentPlayer == orderSongPlayer) {
+        if(currentPlayer == orderSongPlayer){
             orderSongPlayer.pause();
             config.listener.onStop(this, orderSongs.get(0).SongName, false);
-            if (orderSongs.size() > 1) {
+            if(orderSongs.size()>1) {
 
                 nextOrderSongCount = 50;
                 IneMediaSource mediaSource = orderSongs.get(0);
-                if (mediaSource.dataSource.CacheStatus != IneDataSource.CacheStatus_NoCache)
+                if(mediaSource.dataSource.CacheStatus != IneDataSource.CacheStatus_NoCache)
                     cacheCount--;
                 orderSongPlayer.removeMediaItem(0);
                 mediaSource.dataSource.freeCacheBuffer();
                 orderSongs.remove(0);
 
-                PlayListChange();
+                PlayListChange(false);
                 int orderSongIdx;
-                for (orderSongIdx = 0; orderSongIdx < orderSongs.size() && (cacheCount < config.maxCacheCount); orderSongIdx++) {
+                for(orderSongIdx = 0; orderSongIdx < orderSongs.size() && (cacheCount < config.maxCacheCount); orderSongIdx++) {
                     mediaSource = orderSongs.get(orderSongIdx);
-                    if (mediaSource.dataSource.CacheStatus == IneDataSource.CacheStatus_NoCache) {
+                    if(mediaSource.dataSource.CacheStatus == IneDataSource.CacheStatus_NoCache) {
                         mediaSource.dataSource.startCacheBuffer(config.itemCacheSize, config.cacheBandwidthKBS[config.maxCacheCount - 1]);
                         cacheCount++;
                     }
                 }
                 orderSongIdx = 0;
-                for (int i = 1; (i < config.maxCacheCount) && (orderSongIdx < orderSongs.size()); i++, orderSongIdx++) {
+                for(int i = 1; (i < config.maxCacheCount) && (orderSongIdx < orderSongs.size()); i++, orderSongIdx++) {
                     mediaSource = orderSongs.get(orderSongIdx);
                     mediaSource.dataSource.changeCacheSpeed(config.cacheBandwidthKBS[i]);
                 }
@@ -648,8 +590,10 @@ public class InePlayerController {
 //                config.listener.onNext(this, orderSongs.get(0).SongName, false);
 //                if (orderSongs.size() > 1)
 //                    config.listener.onNextSongDisplay(this, orderSongs.get(1).SongName);
+
                 setCurrentPlayer(publicVideoPlayer);
-            } else {
+            }
+            else {
 
                 endOfOrderSong = true;
                 config.listener.onOrderSongFinish(this);
@@ -661,7 +605,7 @@ public class InePlayerController {
                 orderSongs.get(0).dataSource.freeCacheBuffer();
                 orderSongs.remove(0);
 
-                PlayListChange();
+                PlayListChange(false);
                 //setAudioOutput(IneStereoVolumeProcessor.AudioControlOutput_Stereo);
                 int CurrentPublicVideoWindow = publicVideoPlayer.getCurrentWindowIndex();
                 //publicVideoPlayer.seekTo(CurrentPublicVideoWindow, CurrentPublicVideoPosition);
@@ -672,14 +616,12 @@ public class InePlayerController {
         }
 
     }
-
     public void cut() {
-        if (currentPlayer == orderSongPlayer) {
+        if(currentPlayer == orderSongPlayer) {
             resume();
             stop();
         }
     }
-
     private void ReloadOrderSong() {
         orderSongClearMediaItems++;
         orderSongPlayer.clearMediaItems();  // will gen end event
@@ -689,7 +631,6 @@ public class InePlayerController {
         //orderSongPlayer.prepare();
         orderSongPlayer.seekToDefaultPosition(0);
     }
-
     private Runnable checkOrderSongLoop = () -> checkOrderSong();
 
     private void checkOrderSong() {
@@ -708,20 +649,22 @@ public class InePlayerController {
                         config.listener.onNextSongDisplay(this, orderSongs.get(1).SongName);
                 }
             }
-        } else {
+        }
+        else {
             if (currentPlayer == publicVideoPlayer) {
-                if (orderSongPlayerHadError) {
+                if(orderSongPlayerHadError) {
                     orderSongPlayer.stop(true);
                     ReloadOrderSong();
                     orderSongPlayerHadError = false;
                 }
-                if (nextOrderSongCount > 0)
+                if(nextOrderSongCount > 0)
                     nextOrderSongCount--;
                 else {
                     IneMediaSource mediaSource = orderSongs.get(0);
                     if (mediaSource.dataSource.CacheStatus == IneDataSource.CacheStatus_Cached || mediaSource.dataSource.CacheStatus == IneDataSource.CacheStatus_CacheError) {
                         setCurrentPlayer(orderSongPlayer);
-                    } else {
+                    }
+                    else {
                         // need handle timeout
                     }
                 }
@@ -730,7 +673,7 @@ public class InePlayerController {
         }
 
         //protect player hang
-        if (currentPlayer == orderSongPlayer) {
+        if(currentPlayer == orderSongPlayer) {
             long position = orderSongPlayer.getCurrentPosition();
 
             if (!Paused && lastOrderSongPosition == position)
@@ -740,7 +683,7 @@ public class InePlayerController {
             if (orderSongPlayerIdleCount >= IdleTimeOut) {
                 needSwitchSurface = false;
                 orderSongPlayerIdleCount = 0;
-                onOrderSongPlayError();
+                onOrderSongPlayerError(null);
             }
             lastOrderSongPosition = position;
         }
@@ -754,46 +697,44 @@ public class InePlayerController {
             if (publicVideoPlayerIdleCount >= IdleTimeOut) {
                 publicVideoPlayerIdleCount = 0;
                 if (publicVideos.size() > 0) {
-                    onPublicVideoPlayError();
+                    onPublicVideoPlayerError(null);
                 }
             }
             lastPublicVideoPosition = position;
         }
-        handler.postDelayed(checkOrderSongLoop, 100);
+        handler.postDelayed(checkOrderSongLoop , 100);
     }
-
     public void setParameters() {
         DefaultTrackSelector.ParametersBuilder builder = trackSelector.getParameters().buildUpon();
         builder.setMaxVideoBitrate(12000000);
         builder.setMaxVideoFrameRate(30);
-        builder.setMaxVideoSize(1920, 1080);
+        builder.setMaxVideoSize(1920,1080);
         trackSelector.setParameters(builder);
     }
-
     public void showTracks() {
         MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
         for (int rendererIndex = 0; rendererIndex < mappedTrackInfo.getRendererCount(); rendererIndex++) {
             int trackType = mappedTrackInfo.getRendererType(rendererIndex);
             TrackGroupArray groups = mappedTrackInfo.getTrackGroups(rendererIndex);
-            for (int i = 0; i < groups.length; i++) {
+            for(int i=0; i< groups.length; i++) {
                 TrackGroup group = groups.get(i);
-                for (int j = 0; j < group.length; j++) {
+                for(int j=0; j < group.length; j++) {
                     Format format = group.getFormat(j);
-                    if (format.sampleMimeType.contains("video"))
-                        Log.d("showTracks", "[ Render:" + rendererIndex + " Group:" + i + " Track:" + j + "] " + format.codecs + " " + format.sampleMimeType + " " + format.width + "x" + format.height + " " + format.frameRate);
+                    if(format.sampleMimeType.contains("video"))
+                        Log.d("showTracks", "[ Render:"+rendererIndex+" Group:" + i + " Track:"+j+"] " + format.codecs +" "+format.sampleMimeType+" "+format.width+"x"+format.height+" "+format.frameRate);
                     else
-                        Log.d("showTracks", "[ Render:" + rendererIndex + " Group:" + i + " Track:" + j + "] " + format.codecs + " " + format.sampleMimeType + " " + format.sampleRate);
+                        Log.d("showTracks", "[ Render:"+rendererIndex+" Group:" + i + " Track:"+j+"] " + format.codecs +" "+format.sampleMimeType+" "+format.sampleRate);
                     try {
-                        List<com.google.android.exoplayer2.mediacodec.MediaCodecInfo> infos = MediaCodecUtil.getDecoderInfos(format.sampleMimeType, false, false);
-                        for (com.google.android.exoplayer2.mediacodec.MediaCodecInfo info : infos) {
+                        List<com.google.android.exoplayer2.mediacodec.MediaCodecInfo> infos = MediaCodecUtil.getDecoderInfos(format.sampleMimeType,false, false);
+                        for(com.google.android.exoplayer2.mediacodec.MediaCodecInfo info: infos) {
                             String profileLevels = "";
-                            for (MediaCodecInfo.CodecProfileLevel level : info.getProfileLevels())
-                                profileLevels += "[" + level.profile + "," + level.level + "],";
+                            for(MediaCodecInfo.CodecProfileLevel level:info.getProfileLevels())
+                                profileLevels+= "["+level.profile+","+level.level+"],";
                             Log.d("showTracks", "codec " +
                                     info.vendor + " " +
-                                    (info.hardwareAccelerated ? "hardwareAccelerated " : "") +
-                                    (info.softwareOnly ? "softwareOnly " : "") +
-                                    "ProfileLevels " + profileLevels);
+                                    (info.hardwareAccelerated?"hardwareAccelerated ":"")+
+                                    (info.softwareOnly?"softwareOnly ":"") +
+                                    "ProfileLevels "+profileLevels);
                         }
                     } catch (MediaCodecUtil.DecoderQueryException e) {
                         e.printStackTrace();
@@ -804,9 +745,8 @@ public class InePlayerController {
             }
         }
     }
-
     public void setAudioTrack(int track) {
-        System.out.println("setAudioTrack: " + track);
+        System.out.println("setAudioTrack: "  + track);
         MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
 
         ArrayList<Integer> AudioTrackers = new ArrayList<Integer>();
@@ -854,7 +794,7 @@ public class InePlayerController {
 
     protected void setAudioOutput(int type) {
         int AudioTracks = 0;
-        for (int i = 0; i < orderSongPlayer.getCurrentTrackGroups().length; i++) {
+        for(int i = 0; i < orderSongPlayer.getCurrentTrackGroups().length; i++){
             String format = orderSongPlayer.getCurrentTrackGroups().get(i).getFormat(0).sampleMimeType;
 //            String lang = player.getCurrentTrackGroups().get(i).getFormat(0).language;
 //            String id = player.getCurrentTrackGroups().get(i).getFormat(0).id;
@@ -862,28 +802,26 @@ public class InePlayerController {
 //            System.out.println(player.getCurrentTrackGroups().get(i).getFormat(0));
 //            if(format.contains("audio") && id != null && lang != null)
             //System.out.println(lang + " " + id);
-            if (format.contains("audio"))
+            if(format.contains("audio"))
                 AudioTracks++;
         }
 
-        if (AudioTracks > 1) {
-            if (type == IneStereoVolumeProcessor.AudioControlOutput_RightMono)
+        if(AudioTracks > 1) {
+            if(type == IneStereoVolumeProcessor.AudioControlOutput_RightMono)
                 setAudioTrack(1);
             else
                 setAudioTrack(2);
-        } else {
+        }
+        else {
             stereoVolumeProcessor.setMode(type);
         }
-        config.listener.onAudioChannelMappingChanged(this, type);
+        config.listener.onOrderSongAudioChannelMappingChanged(this, type);
     }
-
     private void switchToOrderSongPlayer() {
         publicVideoPlayer.stop();
 
         config.publicVideoView.setVisibility(View.GONE);
         config.orderSongView.setVisibility(View.VISIBLE);
-//        publicVideoPlayer.setVideoSurfaceView(null);
-//        orderSongPlayer.setVideoSurfaceView(config.display);
         orderSongClearMediaItems++;
         //setParameters();
         if(orderSongs.size() > 0)
@@ -897,30 +835,29 @@ public class InePlayerController {
 
     protected void setCurrentPlayer(SimpleExoPlayer newPlayer) {
 
-        if (currentPlayer == newPlayer)
+        if(currentPlayer == newPlayer)
             return;
-        if (newPlayer == orderSongPlayer) {
+        if(newPlayer == orderSongPlayer) {
             //CurrentPublicVideoWindow = publicVideoPlayer.getCurrentWindowIndex();
             //CurrentPublicVideoPosition = publicVideoPlayer.getCurrentPosition();
             orderSongPlayer.prepare();
-            if (orderSongPlayer.getPlaybackState() == Player.STATE_READY) {
+            if(orderSongPlayer.getPlaybackState()==Player.STATE_READY) {
                 switchToOrderSongPlayer();
-            } else {
+            }
+            else {
                 needSwitchSurface = true;
             }
 
             //MainActivity._this.OrderNextTest();
         }
-        if (newPlayer == publicVideoPlayer) {
+        if(newPlayer == publicVideoPlayer) {
             orderSongPlayer.stop();
 
-//            orderSongPlayer.setVideoSurfaceView(null);
-//            publicVideoPlayer.setVideoSurfaceView(config.display);
             config.orderSongView.setVisibility(View.GONE);
             config.publicVideoView.setVisibility(View.VISIBLE);
             publicVideoPlayer.setPlayWhenReady(false);
             publicVideoPlayer.prepare();
-            int state = publicVideoPlayer.getPlaybackState();
+            int state=publicVideoPlayer.getPlaybackState();
             switch (state) {
                 case Player.STATE_BUFFERING:
                     PublicVideoPlayWhenReady = true;
@@ -929,79 +866,110 @@ public class InePlayerController {
                     publicVideoPlayer.play();
                     break;
                 case Player.STATE_ENDED:
-                    publicVideoPlayer.seekTo(0, 0);
+                    publicVideoPlayer.seekTo(0,0);
                     publicVideoPlayer.play();
                     break;
             }
             currentPlayer = publicVideoPlayer;
         }
     }
-
-    protected void PlayListChange() {
-        config.listener.onPlayListChange(this);
+    protected void PlayListChange(boolean isPublicVideo) {
+        config.listener.onPlayListChange(this, isPublicVideo);
     }
-
     protected void onOrderSongReady() {
         //play();
     }
-
     protected void onPublicVideoReady() {
         //play();
     }
-
     protected void onOrderSongEnd() {
-        Log.d("onOrderSongEnd", "End");
+        Log.d("onOrderSongEnd","End");
     }
-
     protected void onPublicVideoEnd() {
-        Log.d("onPublicVideoEnd", "End");
+        Log.d("onPublicVideoEnd","End");
     }
-
-    protected void onOrderSongLoadError() {
-        if (orderSongs.size() > 0)
-            config.listener.onLoadingError(this, orderSongs.get(0).SongName);
+    protected void onOrderSongLoadError(MediaPeriodId mediaPeriodId) {
+        String SongName;
+        if(orderSongs.size()>0)
+            SongName = orderSongs.get(0).SongName;
         else
-            config.listener.onLoadingError(this, "Unknown");
+            SongName = "Unknown";
+        config.listener.onLoadingError(this, SongName, false);
         stop();
     }
 
-    protected void onPublicVideoLoadError() {
-        int idx = publicVideoPlayer.getCurrentWindowIndex();
+    protected void onPublicVideoLoadError(MediaPeriodId mediaPeriodId) {
+        int idx=publicVideoPlayer.getCurrentWindowIndex();
         String SongName;
-        if (publicVideos.size() > idx)
-            SongName = "公播:" + publicVideos.get(idx).SongName;
+        if(publicVideos.size()>idx)
+            SongName="公播:"+publicVideos.get(idx).SongName;
         else
-            SongName = "公播:未知歌曲";
-        config.listener.onLoadingError(this, SongName);
+            SongName="公播:未知歌曲";
+        config.listener.onLoadingError(this, SongName, true);
         publicVideoNext();
     }
-
-    protected void onOrderSongPlayMessage(String message) {
-        if (orderSongs.size() > 0)
-            config.listener.onPlayingError(this, orderSongs.get(0).SongName, message);
+    protected void onOrderSongPlayErrorMessage(String message) {
+        String SongName;
+        if(orderSongs.size()>0)
+            SongName = orderSongs.get(0).SongName;
         else
-            config.listener.onPlayingError(this, "Unknown", message);
+            SongName = "Unknown";
+        config.listener.onPlayingError(this, SongName, message, false);
     }
 
     protected void onPublicVideoPlayMessage(String message) {
-        int idx = publicVideoPlayer.getCurrentWindowIndex();
+        int idx=publicVideoPlayer.getCurrentWindowIndex();
         String SongName;
-        if (publicVideos.size() > idx)
-            SongName = "公播:" + publicVideos.get(idx).SongName;
+        if(publicVideos.size()>idx)
+            SongName="公播:"+publicVideos.get(idx).SongName;
         else
-            SongName = "公播:未知歌曲";
-        config.listener.onPlayingError(this, SongName, message);
+            SongName="公播:未知歌曲";
+        config.listener.onPlayingError(this, SongName, message, true);
     }
-
-    protected void onOrderSongPlayError() {
-        onOrderSongPlayMessage("無法撥放");
+    protected void onOrderSongPlayerError(MediaPeriodId mediaPeriodId) {
         orderSongPlayerHadError = true;
-        stop();
+        if(mediaPeriodId!=null) {
+            int idx = (int)mediaPeriodId.windowSequenceNumber;
+            if (idx == 0) {
+                onOrderSongPlayErrorMessage("撥放錯誤");
+                stop();
+            }
+            else
+            if(idx >= 0 && idx < orderSongs.size()) {
+                orderSongPlayer.removeMediaItem(idx);
+                IneMediaSource item = orderSongs.get(idx);
+                config.listener.onRemovePrepareErrorOrderSong(this,item.SongName, item.dataSource.uri.toString());
+                item.dataSource.freeCacheBuffer();
+                orderSongs.remove(idx);
+                PlayListChange(false);
+            }
+        }
+        else {
+            onOrderSongPlayErrorMessage("撥放錯誤");
+            stop();
+        }
     }
+    protected void onPublicVideoPlayerError(MediaPeriodId mediaPeriodId) {
 
-    protected void onPublicVideoPlayError() {
-        onPublicVideoPlayMessage("公播:無法撥放");
         publicVideoPlayerHadError = true;
-        publicVideoNext();
+        if(mediaPeriodId!=null) {
+            int idx = (int)mediaPeriodId.windowSequenceNumber;
+            if (idx == publicVideoPlayer.getCurrentWindowIndex()) {
+                onPublicVideoPlayMessage("公播:撥放錯誤");
+                publicVideoNext();
+            }
+            else
+            if(idx >= 0 && idx<publicVideos.size()) {
+                publicVideoPlayer.removeMediaItem(idx);
+                IneMediaSource item = publicVideos.get(idx);
+                config.listener.onRemovePrepareErrorPublicVideo(this,item.SongName, item.dataSource.uri.toString());
+                publicVideos.remove(idx);
+                PlayListChange(true);
+            }
+        }
+        else {
+            onPublicVideoPlayMessage("公播:撥放錯誤");
+            publicVideoNext();
+        }
     }
 }

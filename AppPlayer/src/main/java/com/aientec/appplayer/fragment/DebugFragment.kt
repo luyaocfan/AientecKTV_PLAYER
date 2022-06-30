@@ -1,10 +1,6 @@
 package com.aientec.appplayer.fragment
 
-import android.content.Context
-import android.media.AudioManager
-import android.os.Build
 import android.os.Bundle
-import android.telecom.Call
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,12 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aientec.appplayer.BuildConfig
 import com.aientec.appplayer.databinding.FragmentDebugBinding
 import com.aientec.appplayer.databinding.ItemLogBinding
-import com.aientec.appplayer.util.AudioStreamGate
 import com.aientec.appplayer.viewmodel.DebugViewModel
-import com.aientec.appplayer.viewmodel.OsdViewModel
 import com.aientec.appplayer.viewmodel.PlayerViewModel
-import idv.bruce.ui.osd.container.MarqueView
-import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -30,8 +22,6 @@ class DebugFragment : Fragment() {
       private lateinit var binding: FragmentDebugBinding
 
       private val debugViewModel: DebugViewModel by activityViewModels()
-
-      private val osdViewModel: OsdViewModel by activityViewModels()
 
       private val playerViewModel: PlayerViewModel by activityViewModels()
 

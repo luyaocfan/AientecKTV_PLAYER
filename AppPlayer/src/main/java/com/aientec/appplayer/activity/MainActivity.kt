@@ -2,24 +2,15 @@ package com.aientec.appplayer.activity
 
 import android.os.Bundle
 import android.view.View
-import android.view.Window
-import android.view.WindowManager
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.widget.addTextChangedListener
 import com.aientec.appplayer.databinding.ActivityMainBinding
 import com.aientec.appplayer.model.Repository
 import com.aientec.appplayer.viewmodel.DebugViewModel
-import com.aientec.appplayer.viewmodel.OsdViewModel
 import com.aientec.appplayer.viewmodel.SystemViewModel
 import com.aientec.appplayer.viewmodel.PlayerViewModel
-import org.acra.util.ToastSender
 
 class MainActivity : AppCompatActivity() {
       private lateinit var binding: ActivityMainBinding
@@ -29,8 +20,6 @@ class MainActivity : AppCompatActivity() {
       private val systemViewModel: SystemViewModel by viewModels()
 
       private val playerViewModel: PlayerViewModel by viewModels()
-
-      private val osdViewModel: OsdViewModel by viewModels()
 
       private val debugViewModel: DebugViewModel by viewModels()
 
@@ -76,9 +65,8 @@ class MainActivity : AppCompatActivity() {
 
             playerViewModel.onRepositoryAttach(repository)
 
-            osdViewModel.onRepositoryAttach(repository)
-
-            debugViewModel.onRepositoryAttach(repository)
+//
+//            debugViewModel.onRepositoryAttach(repository)
 
             systemViewModel.isDataSyn.observe(this) {
                   val res: Boolean = it ?: return@observe
@@ -88,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                         setContentView(binding.root)
 
                         binding.test.setOnClickListener {
-                              osdViewModel.test()
+                              playerViewModel.test()
                         }
 
                         disconnectDialog = AlertDialog.Builder(this)

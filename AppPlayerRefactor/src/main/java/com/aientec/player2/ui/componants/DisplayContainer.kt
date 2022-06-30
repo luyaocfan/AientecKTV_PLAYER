@@ -2,10 +2,12 @@ package com.aientec.player2.ui.componants
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,11 +30,11 @@ import com.aientec.player2.ui.theme.AientecKTV_PLAYERTheme
 import com.aientec.player2.viewmodel.PlayerViewModel
 
 @Composable
-fun DisplayContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
-//    OSDContainer(viewModel = viewModel)
+fun DisplayContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
+    OSDContainer(viewModel = viewModel)
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (idle, notify, mute, state, rating) = createRefs()
+        val (idle, notify, mute, state, rating, next) = createRefs()
 
         val isIdle by viewModel.isIdle.observeAsState(initial = true)
 
@@ -50,6 +52,7 @@ fun DisplayContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
                     top.linkTo(parent.top, margin = 8.dp)
                     start.linkTo(parent.start, margin = 8.dp)
                 }
+                .clickable { viewModel._test() }
                 .background(
                     Color(0f, 0f, 0f, if (isIdle) 0.5f else 0f)
                 )
@@ -86,8 +89,9 @@ fun DisplayContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
                 .alpha(if (isMute) 1f else 0f))
         }
 
+
         if (playerState != PlayerViewModel.PLAYER_STATE_NONE) {
-            val stateRes : Pair<Int, Int>? = when (playerState) {
+            val stateRes: Pair<Int, Int>? = when (playerState) {
                 PlayerViewModel.PLAYER_STATE_RESUME -> Pair(
                     R.drawable.ic_resume,
                     R.string.player_state_resume
@@ -140,6 +144,18 @@ fun DisplayContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
                     .fillMaxWidth(0.2f),
                 contentScale = ContentScale.FillWidth
             )
+        }
+
+        Column(
+            modifier = Modifier
+                .constrainAs(next) {
+
+                }
+                .background(Color.Blue)
+                .fillMaxWidth(0.2f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
         }
     }
 
