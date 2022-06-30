@@ -4,8 +4,10 @@ import android.content.Context
 import android.media.AudioManager
 import android.util.Log
 import android.view.SurfaceView
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -56,12 +58,14 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
             maxCacheCount = MAXIMUM_CACHE_COUNT
             itemCacheSize = MAXIMUM_CACHE_SIZE
             cacheBandwidthKBS = CACHE_BANDWIDTH_KBS
-            listener = InePlayerEventListener(viewModel)
+            listener = InePlayerEventListener(viewModel, audioManager)
         }
 
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(key1 = mContext) {
+
+        adjustAudioVolume(audioManager, true)
 
         mController = initPlayer(config)
 
@@ -159,7 +163,6 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
     )
 
     DisplayContainer(viewModel)
-
 }
 
 private fun updateIdleMtvList(
@@ -212,7 +215,7 @@ private fun initPlayer(configure: InePlayerController.InePlayerControllerConfigu
     return controller
 }
 
-private class InePlayerEventListener(val viewModel: PlayerViewModel) :
+private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: AudioManager) :
     InePlayerController.EventListen {
     override fun onPlayListChange(controller: InePlayerController?) {
         super.onPlayListChange(controller)
@@ -229,8 +232,10 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel) :
     ) {
         super.onStop(controller, Name, isPublicVideo)
         Log.e(TAG, "onStop : $Name, $isPublicVideo")
-        if (!isPublicVideo)
+        if (!isPublicVideo) {
             viewModel.onPlayerEnd()
+            adjustAudioVolume(am, true)
+        }
     }
 
     override fun onNext(
@@ -240,8 +245,10 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel) :
     ) {
         super.onNext(controller, Name, isPublicVideo)
         Log.e(TAG, "onNext : $Name, $isPublicVideo")
-        if (!isPublicVideo)
+        if (!isPublicVideo) {
             viewModel.onPlayerStart()
+            adjustAudioVolume(am, false)
+        }
     }
 
     override fun onNextSongDisplay(controller: InePlayerController?, Name: String?) {
@@ -261,10 +268,19 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel) :
     ) {
         super.onPlayingError(controller, Name, Message)
         Log.e(TAG, "onPlayingError : $Name, $Message")
+
     }
 
     override fun onAudioChannelMappingChanged(controller: InePlayerController?, type: Int) {
         super.onAudioChannelMappingChanged(controller, type)
         Log.e(TAG, "onAudioChannelMappingChanged : $type")
     }
+}
+
+private fun adjustAudioVolume(am: AudioManager, isIdle: Boolean) {
+    val maxVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+
+    val volume: Int = if (isIdle) (0.5f * maxVolume.toFloat()).toInt() else maxVolume
+
+    am.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
 }

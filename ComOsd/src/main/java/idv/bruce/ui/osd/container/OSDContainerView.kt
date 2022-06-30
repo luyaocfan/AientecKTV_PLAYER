@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.util.Size
 import android.view.Choreographer
+import android.view.SurfaceView
 import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -20,8 +21,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
-class OSDContainerView(context: Context, attr: AttributeSet? = null) : View(context, attr),
-    Choreographer.FrameCallback, OsdContainer {
+class OSDContainerView(context: Context, attr: AttributeSet? = null) : SurfaceView(context, attr), OsdContainer {
     companion object {
         const val TAG: String = "OSD_Container"
     }
@@ -31,8 +31,6 @@ class OSDContainerView(context: Context, attr: AttributeSet? = null) : View(cont
     private val service: ExecutorService = Executors.newSingleThreadExecutor()
 
     private var future: Future<*>? = null
-
-    private val choreographer: Choreographer = Choreographer.getInstance()
 
     var eventListener: OsdEventListener?
         get() {
@@ -106,11 +104,6 @@ class OSDContainerView(context: Context, attr: AttributeSet? = null) : View(cont
         }
     }
 
-    override fun doFrame(frameTimeNanos: Long) {
-        postInvalidate()
-        choreographer.postFrameCallback(this)
-    }
-
     override fun addOsdItem(item: OSDItem) {
         queue.add(item)
         onStart()
@@ -126,14 +119,12 @@ class OSDContainerView(context: Context, attr: AttributeSet? = null) : View(cont
         }
         if (!isAnime) {
             isAnime = true
-            choreographer.postFrameCallback(this)
         }
     }
 
     override fun onStop() {
         if (isAnime) {
             isAnime = false
-            choreographer.removeFrameCallback(this)
         }
     }
 

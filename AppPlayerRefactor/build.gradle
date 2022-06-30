@@ -8,11 +8,12 @@ android {
 
     defaultConfig {
         applicationId "com.aientec.player2"
-        minSdk 27
-        targetSdk 32
+        minSdkVersion 25
+        targetSdkVersion 32
         versionCode 1
-        versionName "1.0"
-
+        versionName "0.0.1"
+        project.archivesBaseName = "PLAYER_REFACTOR_${defaultConfig.versionName}"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true

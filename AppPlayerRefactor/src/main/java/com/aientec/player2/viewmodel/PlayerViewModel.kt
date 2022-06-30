@@ -88,6 +88,8 @@ class PlayerViewModel : ViewModel() {
 
             model.roomStateChangeListener = roomStateChangeListener
 
+            model.osdListener = osdListener
+
             model.addAudioUpdateListener(audioUpdateListener)
 
             val res: Boolean = model.systemInitial()
@@ -185,7 +187,7 @@ class PlayerViewModel : ViewModel() {
 
     private fun updateState(state: Int, keep: Boolean) {
 
-        if(!mIsIdle) {
+        if (!mIsIdle) {
             mPlayerState = state
 
             stateTimer?.cancel()
@@ -219,7 +221,7 @@ class PlayerViewModel : ViewModel() {
     private val audioUpdateListener: PlayerModel.AudioUpdateListener =
         object : PlayerModel.AudioUpdateListener {
             override fun onRecorderToggle(toggle: Boolean) {
-                TODO("Not yet implemented")
+
             }
 
             override fun onMicVolumeChanged(value: Int) {
@@ -287,5 +289,12 @@ class PlayerViewModel : ViewModel() {
             }
         }
 
-
+    private val osdListener: PlayerModel.OsdListener = object : PlayerModel.OsdListener {
+        override fun onOsdEvent(messageBundle: MessageBundle) {
+            if (messageBundle.type != MessageBundle.Type.VOD)
+                osdMessage.postValue(messageBundle)
+            else
+                updateNotifyMessage(messageBundle.data as String)
+        }
+    }
 }
