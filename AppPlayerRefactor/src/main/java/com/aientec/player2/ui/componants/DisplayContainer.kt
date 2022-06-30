@@ -29,6 +29,8 @@ import com.aientec.player2.viewmodel.PlayerViewModel
 
 @Composable
 fun DisplayContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
+//    OSDContainer(viewModel = viewModel)
+
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (idle, notify, mute, state, rating) = createRefs()
 
@@ -141,7 +143,7 @@ fun DisplayContainer(viewModel : PlayerViewModel = PlayerViewModel()) {
         }
     }
 
-//    OSDContainer(viewModel = viewModel)
+
 }
 
 @Composable

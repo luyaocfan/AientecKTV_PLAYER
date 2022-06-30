@@ -257,6 +257,7 @@ class PlayerViewModel : ViewModel() {
             }
 
             override fun onCut() {
+//                _test()
                 playerControl.postValue(PlayerControl.CUT)
             }
 
@@ -296,5 +297,12 @@ class PlayerViewModel : ViewModel() {
             else
                 updateNotifyMessage(messageBundle.data as String)
         }
+    }
+
+    fun _test(){
+        osdMessage.postValue(MessageBundle().apply {
+            this.data = "1233456789"
+            this.type = MessageBundle.Type.TXT
+        })
     }
 }

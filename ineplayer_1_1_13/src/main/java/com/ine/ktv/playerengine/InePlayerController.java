@@ -50,10 +50,10 @@ public class InePlayerController {
 
     static public class InePlayerControllerConfigure {
         public Context context;
-//        public SurfaceView orderSongView, publicVideoView;
-        public SurfaceView display;
+        public PlayerView orderSongView, publicVideoView;
+//        public SurfaceView display;
         public int maxCacheCount = 4;
-        public int itemCacheSize = 1024 * 1024 * 2;
+        public int itemCacheSize = 1024 * 1024 * 4;
         public int[] cacheBandwidthKBS = new int[]{512, 256, 128, 64};
         public int publicVideoPlayingBufferSize = 1024 * 1024 * 32;
         public EventListen listener;
@@ -61,9 +61,9 @@ public class InePlayerController {
         public InePlayerControllerConfigure clone() {
             InePlayerControllerConfigure newConfig = new InePlayerControllerConfigure();
             newConfig.context = this.context;
-//            newConfig.orderSongView = this.orderSongView;
-//            newConfig.publicVideoView = this.publicVideoView;
-            newConfig.display = this.display;
+            newConfig.orderSongView = this.orderSongView;
+            newConfig.publicVideoView = this.publicVideoView;
+//            newConfig.display = this.display;
             newConfig.maxCacheCount = this.maxCacheCount;
             newConfig.itemCacheSize = this.itemCacheSize;
             newConfig.cacheBandwidthKBS = new int[this.cacheBandwidthKBS.length];
@@ -346,13 +346,13 @@ public class InePlayerController {
                 .build();
 //        showCodecs();
         orderSongPlayer.addListener(orderSongPlayerListener);
-//        config.orderSongView.setPlayer(orderSongPlayer);
+        config.orderSongView.setPlayer(orderSongPlayer);
 //        orderSongPlayer.setVideoSurfaceView(config.orderSongView);
 
         publicVideoPlayer = new SimpleExoPlayer.Builder(this.config.context).build();
         publicVideoPlayer.addListener(publicVideoPlayerListener);
         publicVideoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
-//        config.publicVideoView.setPlayer(publicVideoPlayer);
+        config.publicVideoView.setPlayer(publicVideoPlayer);
 //        publicVideoPlayer.setVideoSurfaceView(config.publicVideoView);
 
         setCurrentPlayer(publicVideoPlayer);
@@ -879,10 +879,10 @@ public class InePlayerController {
     private void switchToOrderSongPlayer() {
         publicVideoPlayer.stop();
 
-//        config.publicVideoView.setVisibility(View.GONE);
-//        config.orderSongView.setVisibility(View.VISIBLE);
-        publicVideoPlayer.setVideoSurfaceView(null);
-        orderSongPlayer.setVideoSurfaceView(config.display);
+        config.publicVideoView.setVisibility(View.GONE);
+        config.orderSongView.setVisibility(View.VISIBLE);
+//        publicVideoPlayer.setVideoSurfaceView(null);
+//        orderSongPlayer.setVideoSurfaceView(config.display);
         orderSongClearMediaItems++;
         //setParameters();
 
@@ -913,10 +913,10 @@ public class InePlayerController {
         if (newPlayer == publicVideoPlayer) {
             orderSongPlayer.stop();
 
-            orderSongPlayer.setVideoSurfaceView(null);
-            publicVideoPlayer.setVideoSurfaceView(config.display);
-//            config.orderSongView.setVisibility(View.GONE);
-//            config.publicVideoView.setVisibility(View.VISIBLE);
+//            orderSongPlayer.setVideoSurfaceView(null);
+//            publicVideoPlayer.setVideoSurfaceView(config.display);
+            config.orderSongView.setVisibility(View.GONE);
+            config.publicVideoView.setVisibility(View.VISIBLE);
             publicVideoPlayer.setPlayWhenReady(false);
             publicVideoPlayer.prepare();
             int state = publicVideoPlayer.getPlaybackState();

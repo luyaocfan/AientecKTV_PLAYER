@@ -21,7 +21,10 @@ import com.aientec.player2.BuildConfig
 import com.aientec.player2.data.PlayerControl
 import com.aientec.player2.viewmodel.PlayerViewModel
 import com.aientec.structure.Track
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.audio.IneStereoVolumeProcessor
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.PlayerView
 import com.ine.ktv.playerengine.InePlayerController
 import java.util.*
 
@@ -66,7 +69,6 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(key1 = mContext) {
-
 
 
         mController = initPlayer(config)
@@ -146,23 +148,27 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
 
     AndroidView(
         factory = {
-            SurfaceView(it).apply {
-                config.display = this
+            PlayerView(it).apply {
+                config.publicVideoView = this
+                this.useController = false
+                this.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
             }
         }, modifier = Modifier
             .fillMaxSize()
-            .background(Color.Transparent)
+    )
+
+    AndroidView(
+        factory = {
+            PlayerView(it).apply {
+                config.orderSongView = this
+                this.useController = false
+                this.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+            }
+        }, modifier = Modifier
+            .fillMaxSize()
     )
 //
-//    AndroidView(
-//        factory = {
-//            SurfaceView(it).apply {
-//                config.publicVideoView = this
-//            }
-//        }, modifier = Modifier
-//            .fillMaxSize()
-//            .background(Color.Transparent)
-//    )
+
 
     DisplayContainer(viewModel)
 }

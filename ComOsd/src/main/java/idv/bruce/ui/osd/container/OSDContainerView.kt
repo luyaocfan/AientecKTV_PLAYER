@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.util.Size
 import android.view.Choreographer
+import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import androidx.lifecycle.Lifecycle
@@ -21,16 +22,13 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
-class OSDContainerView(context: Context, attr: AttributeSet? = null) : SurfaceView(context, attr), OsdContainer {
+class OSDContainerView(context: Context, attr: AttributeSet? = null) : SurfaceView(context, attr),
+    OsdContainer {
     companion object {
         const val TAG: String = "OSD_Container"
     }
 
     private val queue: OSDQueue = OSDQueue()
-
-    private val service: ExecutorService = Executors.newSingleThreadExecutor()
-
-    private var future: Future<*>? = null
 
     var eventListener: OsdEventListener?
         get() {
@@ -40,31 +38,39 @@ class OSDContainerView(context: Context, attr: AttributeSet? = null) : SurfaceVi
             queue.eventListener = value
         }
 
-    private var isAnime: Boolean = false
-
     private var isViewPortReady: Boolean = false
 
     private var mWidth: Int = -1
 
     private var mHeight: Int = -1
 
-    private var debugThread: ExecutorService = Executors.newSingleThreadExecutor()
+    private var mHolder: SurfaceHolder? = null
 
-    private var mLastTimeNanos: Long = -1L
-
-    private var workerThread: ExecutorService = Executors.newSingleThreadExecutor()
+    private var drawerThread: ExecutorService = Executors.newSingleThreadExecutor()
 
     init {
-        (context as LifecycleOwner).apply {
-            lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    onStart()
-                }
-                repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    onStop()
-                }
+        this.holder.addCallback(object : SurfaceHolder.Callback2 {
+            override fun surfaceCreated(p0: SurfaceHolder) {
+                Log.d(TAG, "surfaceCreated")
             }
-        }
+
+            override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
+                Log.d(TAG, "surfaceChanged")
+                mHolder = p0
+                mHolder!!.setFormat(PixelFormat.TRANSPARENT)
+                drawerThread.submit(drawWorker)
+            }
+
+            override fun surfaceDestroyed(p0: SurfaceHolder) {
+                mHolder = null
+                drawerThread.shutdownNow()
+            }
+
+            override fun surfaceRedrawNeeded(p0: SurfaceHolder) {
+
+            }
+
+        })
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -83,30 +89,9 @@ class OSDContainerView(context: Context, attr: AttributeSet? = null) : SurfaceVi
         }
     }
 
-    override fun onDraw(canvas: Canvas?) {
-        if (isAnime && isViewPortReady) {
-            val mCanvas = canvas ?: return
-
-            val frameTimeNanos: Long = System.nanoTime()
-
-            if (mLastTimeNanos == -1L)
-                mLastTimeNanos = frameTimeNanos
-
-            mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-
-            queue.onDraw(mCanvas, frameTimeNanos, frameTimeNanos - mLastTimeNanos)
-
-            mLastTimeNanos = frameTimeNanos
-
-
-        } else {
-            super.onDraw(canvas)
-        }
-    }
 
     override fun addOsdItem(item: OSDItem) {
         queue.add(item)
-        onStart()
     }
 
     override fun removeOsdItem(item: OSDItem) {
@@ -114,17 +99,39 @@ class OSDContainerView(context: Context, attr: AttributeSet? = null) : SurfaceVi
     }
 
     override fun onStart() {
-        debugThread.submit {
-            Log.d("OSD", "Queue : ${queue.size}")
-        }
-        if (!isAnime) {
-            isAnime = true
-        }
+
     }
 
     override fun onStop() {
-        if (isAnime) {
-            isAnime = false
+
+    }
+
+    private val drawWorker: Runnable = Runnable {
+        var frameTimeNanos = System.nanoTime()
+
+        var lastTimeNanos = -1L
+
+        val updateTimeNanos = 1000000000 / 20
+
+        while (mHolder != null) {
+
+            if (frameTimeNanos - lastTimeNanos > updateTimeNanos) {
+                val mCanvas = mHolder!!.lockCanvas() ?: continue
+
+                if (lastTimeNanos == -1L)
+                    lastTimeNanos = frameTimeNanos
+
+                mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+
+                Log.d(TAG, "Draw")
+
+                queue.onDraw(mCanvas, frameTimeNanos, frameTimeNanos - lastTimeNanos)
+
+                lastTimeNanos = frameTimeNanos
+
+                mHolder?.unlockCanvasAndPost(mCanvas)
+            }
+            Thread.yield()
         }
     }
 
