@@ -225,9 +225,7 @@ private fun initPlayer(configure: InePlayerController.InePlayerControllerConfigu
 
 private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: AudioManager) :
     InePlayerController.EventListen {
-    override fun onPlayListChange(controller: InePlayerController?) {
-        super.onPlayListChange(controller)
-    }
+
 
     override fun onOrderSongFinish(controller: InePlayerController?) {
         super.onOrderSongFinish(controller)
@@ -264,25 +262,7 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: Aud
         Log.e(TAG, "onNextSongDisplay : $Name")
     }
 
-    override fun onLoadingError(controller: InePlayerController?, Name: String?) {
-        super.onLoadingError(controller, Name)
-        Log.e(TAG, "onLoadingError : $Name")
-    }
 
-    override fun onPlayingError(
-        controller: InePlayerController?,
-        Name: String?,
-        Message: String?
-    ) {
-        super.onPlayingError(controller, Name, Message)
-        Log.e(TAG, "onPlayingError : $Name, $Message")
-
-    }
-
-    override fun onAudioChannelMappingChanged(controller: InePlayerController?, type: Int) {
-        super.onAudioChannelMappingChanged(controller, type)
-        Log.e(TAG, "onAudioChannelMappingChanged : $type")
-    }
 }
 
 private fun adjustAudioVolume(am: AudioManager, isIdle: Boolean) {
