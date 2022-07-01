@@ -498,7 +498,7 @@ public class InePlayerController {
     }
     public void resume() {
         if(currentPlayer == orderSongPlayer && Paused) {
-            setCurrentPlayer(orderSongPlayer);
+//            setCurrentPlayer(orderSongPlayer);
             orderSongPlayer.play();
             Paused = false;
         }

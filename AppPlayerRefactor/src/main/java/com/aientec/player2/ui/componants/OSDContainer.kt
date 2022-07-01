@@ -1,5 +1,6 @@
 package com.aientec.player2.ui.componants
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
@@ -7,8 +8,12 @@ import android.net.Uri
 import android.util.Log
 import android.view.SurfaceView
 import android.widget.ImageView
+import androidx.compose.animation.core.animateValue
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -102,37 +107,54 @@ private fun OsdPicture(url: String) {
     )
 }
 
+@SuppressLint("Range")
 @Composable
 private fun OsdApng(apngDrawable: ApngDrawable, onDone: () -> Unit) {
-    val drawable: ApngDrawable = remember {
-        apngDrawable
-    }
+//    val drawable: ApngDrawable = remember {
+//        apngDrawable
+//    }
+//    val infiniteTransition = rememberInfiniteTransition()
+//
+//    val timeStamp by infiniteTransition.animateValue(
+//        initialValue = 0L,
+//        targetValue = drawable.durationMillis.toLong(),
+//        animationSpec = infiniteRepeatable(animation = )
+//    )
+//
+//    Surface(
+//        modifier = Modifier
+//            .width(800.dp)
+//            .width(800.dp)
+//    ) {
+//
+//    }
 
-    AndroidView(
-        factory = {
-            ImageView(it).apply {
-                scaleType = ImageView.ScaleType.FIT_XY
-
-                setImageDrawable(drawable)
-
-
-                drawable.registerRepeatAnimationCallback(object : RepeatAnimationCallback {
-                    override fun onAnimationRepeat(drawable: ApngDrawable, nextLoopIndex: Int) {
-                        super.onAnimationRepeat(drawable, nextLoopIndex)
-                        if (nextLoopIndex > 3) {
-                            drawable.recycle()
-                            onDone()
-                        }
-                    }
-
-                })
-
-                drawable.start()
-            }
-        }, modifier = Modifier
-            .width(800.dp)
-            .height(800.dp)
-    )
+//    AndroidView(
+//        factory = {
+//            ImageView(it).apply {
+//                scaleType = ImageView.ScaleType.FIT_XY
+//
+//                setImageDrawable(drawable)
+//
+//
+//
+//                drawable.registerRepeatAnimationCallback(object : RepeatAnimationCallback {
+//                    override fun onAnimationRepeat(drawable: ApngDrawable, nextLoopIndex: Int) {
+//                        super.onAnimationRepeat(drawable, nextLoopIndex)
+//                        if (nextLoopIndex > 3) {
+//                            drawable.recycle()
+//                            onDone()
+//                        }
+//                    }
+//
+//                })
+//
+//                drawable.start()
+//            }
+//        }, modifier = Modifier
+//            .width(800.dp)
+//            .height(800.dp)
+//    )
 }
 
 @Composable
