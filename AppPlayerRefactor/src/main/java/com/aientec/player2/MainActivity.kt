@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -27,6 +29,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.aientec.player2.ui.componants.MTVContainer
+import com.aientec.player2.ui.componants.OSDContainer
 import com.aientec.player2.ui.componants.Prepare
 import com.aientec.player2.ui.theme.AientecKTV_PLAYERTheme
 import com.aientec.player2.ui.theme.Purple200
@@ -39,29 +42,37 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         hideSystemBars()
 
+
+
         setContent {
             AientecKTV_PLAYERTheme {
                 val navController = rememberNavController()
 
                 val connectState by viewModel.isConnected.observeAsState(initial = true)
 
+                LaunchedEffect(LocalContext.current) {
+                    viewModel.dataSyn.observe(this@MainActivity) {
+                        if (it)
+                            navController.navigate("mtv")
+                        else
+                            navController.navigate("prepare")
+                    }
+
+                    viewModel.toastMsg.observe(this@MainActivity) {
+                        if (it != null) {
+                            Toast.makeText(this@MainActivity, it, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+
+
                 NavHost(navController = navController, startDestination = "mtv") {
                     composable("prepare") { Prepare(viewModel) }
                     composable("mtv") { MTVContainer(viewModel) }
                 }
 
-                viewModel.dataSyn.observe(this) {
-                    if (it)
-                        navController.navigate("mtv")
-                    else
-                        navController.navigate("prepare")
-                }
+                OSDContainer(viewModel)
 
-                viewModel.toastMsg.observe(this) {
-                    if (it != null) {
-                        Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-                    }
-                }
 
                 if (!connectState) {
                     Dialog(

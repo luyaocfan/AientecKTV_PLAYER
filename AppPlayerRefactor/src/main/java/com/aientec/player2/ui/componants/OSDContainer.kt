@@ -3,25 +3,32 @@ package com.aientec.player2.ui.componants
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
 import android.view.SurfaceView
 import android.widget.ImageView
-import androidx.compose.animation.core.animateValue
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.toRect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Devices
@@ -38,13 +45,14 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.EventLogger
 import com.linecorp.apng.ApngDrawable
 import com.linecorp.apng.RepeatAnimationCallback
+import idv.bruce.ui.osd.container.ApngView
+import idv.bruce.ui.osd.container.OSDContainerView
 import java.io.File
 import java.io.IOException
 import java.util.*
 
 @Composable
 fun OSDContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
-    val mLifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
     val osdMessage by viewModel.osdMessage.observeAsState(null)
 
@@ -109,52 +117,18 @@ private fun OsdPicture(url: String) {
 
 @SuppressLint("Range")
 @Composable
-private fun OsdApng(apngDrawable: ApngDrawable, onDone: () -> Unit) {
-//    val drawable: ApngDrawable = remember {
-//        apngDrawable
-//    }
-//    val infiniteTransition = rememberInfiniteTransition()
-//
-//    val timeStamp by infiniteTransition.animateValue(
-//        initialValue = 0L,
-//        targetValue = drawable.durationMillis.toLong(),
-//        animationSpec = infiniteRepeatable(animation = )
-//    )
-//
-//    Surface(
-//        modifier = Modifier
-//            .width(800.dp)
-//            .width(800.dp)
-//    ) {
-//
-//    }
+private fun OsdApng(apngDrawable: ApngDrawable?, onDone: () -> Unit) {
+    val drawable = remember {
+        apngDrawable
+    }
 
-//    AndroidView(
-//        factory = {
-//            ImageView(it).apply {
-//                scaleType = ImageView.ScaleType.FIT_XY
-//
-//                setImageDrawable(drawable)
-//
-//
-//
-//                drawable.registerRepeatAnimationCallback(object : RepeatAnimationCallback {
-//                    override fun onAnimationRepeat(drawable: ApngDrawable, nextLoopIndex: Int) {
-//                        super.onAnimationRepeat(drawable, nextLoopIndex)
-//                        if (nextLoopIndex > 3) {
-//                            drawable.recycle()
-//                            onDone()
-//                        }
-//                    }
-//
-//                })
-//
-//                drawable.start()
-//            }
-//        }, modifier = Modifier
-//            .width(800.dp)
-//            .height(800.dp)
-//    )
+    AndroidView(factory = {
+        ApngView(it, 3) {
+            onDone()
+        }.apply {
+            this.apngDrawable = drawable
+        }
+    }, modifier = Modifier.size(400.dp))
 }
 
 @Composable

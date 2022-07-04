@@ -314,6 +314,8 @@ class PlayerViewModel : ViewModel() {
     }
 
     fun _test() {
-        model._test()
+        viewModelScope.launch {
+            model._test()
+        }
     }
 }

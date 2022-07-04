@@ -1,6 +1,7 @@
 package com.aientec.player2.model
 
 import android.content.Context
+import android.content.res.AssetManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.aientec.ktv_portal2.PortalResponse
@@ -89,10 +90,13 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
 
     private val audioUpdateListenerList: ArrayList<AudioUpdateListener> = ArrayList()
 
+    private val emojiMap: HashMap<String, ApngDrawable> = HashMap()
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
 
     private fun init() {
+        preloadEmoji()
 
         PortalService2.apiRoot = BuildConfig.PORTAL_SERVER
 
@@ -110,6 +114,24 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
         wifiService.init()
 
         wifiService.addListener(this, listener)
+    }
+
+    private fun preloadEmoji() {
+        val asset: AssetManager = contextRef.get()!!.assets
+
+        val list = asset.list("anime")
+
+        for (fileName in list!!.iterator()) {
+            val inputStream: InputStream =
+                mContext.assets.open("anime/$fileName")
+
+            val apngDrawable: ApngDrawable =
+                ApngDrawable.Companion.decode(inputStream)
+
+            emojiMap[fileName] = apngDrawable
+
+            inputStream.close()
+        }
     }
 
 
@@ -355,13 +377,9 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
             return@EventListener true
         }
 
-    fun _test() {
+    suspend fun _test() = withContext(coroutineContext) {
 
-        val inputStream: InputStream =
-            mContext.assets.open("anime/elephant.gif")
-
-        val apngDrawable: ApngDrawable =
-            ApngDrawable.Companion.decode(inputStream)
+        val apngDrawable = emojiMap["elephant.gif"]
 
         val messageBundle: MessageBundle = MessageBundle()
         messageBundle.type = MessageBundle.Type.EMOJI
