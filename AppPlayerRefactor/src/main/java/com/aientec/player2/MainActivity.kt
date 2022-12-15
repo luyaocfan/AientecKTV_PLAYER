@@ -43,7 +43,6 @@ class MainActivity : ComponentActivity() {
         hideSystemBars()
 
 
-
         setContent {
             AientecKTV_PLAYERTheme {
                 val navController = rememberNavController()

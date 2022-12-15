@@ -1,5 +1,6 @@
 package com.aientec.player2.ui.componants
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +30,9 @@ import com.aientec.player2.R
 import com.aientec.player2.ui.theme.AientecKTV_PLAYERTheme
 import com.aientec.player2.viewmodel.PlayerViewModel
 
+/**
+ * 狀態提示頁面
+ */
 @Composable
 fun DisplayContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
     OSDContainer(viewModel = viewModel)
@@ -89,8 +93,8 @@ fun DisplayContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
                 .alpha(if (isMute) 1f else 0f))
         }
 
-
         if (playerState != PlayerViewModel.PLAYER_STATE_NONE) {
+            Log.d("luyao", "playerState : $playerState")
             val stateRes: Pair<Int, Int>? = when (playerState) {
                 PlayerViewModel.PLAYER_STATE_RESUME -> Pair(
                     R.drawable.ic_resume,

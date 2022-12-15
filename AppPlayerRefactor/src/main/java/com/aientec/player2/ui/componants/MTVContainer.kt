@@ -45,6 +45,9 @@ val CACHE_BANDWIDTH_KBS = intArrayOf(4096, 1024, 512, 256)
 
 const val TAG: String = "MTVContainer"
 
+/**
+ * 播放頁面
+ */
 @Composable
 fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
 
@@ -99,8 +102,8 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
                 when (it) {
                     PlayerControl.CUT -> {
                         if (!controller.isInPublicVideo) {
-                            controller.cut()
                             viewModel.onPlayerCut()
+                            controller.cut()
                         }
                     }
                     is PlayerControl.MUTE -> {
@@ -286,8 +289,10 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: Aud
         isPublicVideo: Boolean
     ) {
         super.onLoadingError(controller, Name, isPublicVideo)
+        viewModel.onToast("onLoadingError ${if (isPublicVideo) "公播" else "點播"} $Name")
         if (!isPublicVideo) {
-
+            viewModel.onPlayerEnd()
+            adjustAudioVolume(am, true)
         }
     }
 
@@ -299,6 +304,10 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: Aud
     ) {
         super.onPlayingError(controller, Name, Message, isPublicVideo)
         viewModel.onToast("onPlayingError ${if (isPublicVideo) "公播" else "點播"} $Name : $Message")
+        if (!isPublicVideo) {
+            viewModel.onPlayerEnd()
+            adjustAudioVolume(am, true)
+        }
     }
 
     override fun onRemovePrepareErrorOrderSong(

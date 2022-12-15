@@ -23,7 +23,7 @@ android {
         targetSdkVersion 30
         versionCode 27
         versionName "0.0.38"
-        project.archivesBaseName = "PLAYER_${defaultConfig.versionName}"
+        project.archivesBaseName = "PLAYER_PURE_MTV_${defaultConfig.versionName}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -120,9 +120,9 @@ dependencies {
 //    implementation(name: 'core-0.0.1', ext: 'aar')
     implementation 'com.aientec.ktv:core:0.0.3'
 //    implementation(name: 'portal-0.0.1', ext: 'aar')
-    implementation 'com.aientec.ktv:portal:0.0.1'
+    implementation 'com.aientec.ktv:portal:0.0.6'
 //    implementation(name: 'iot-0.0.6', ext: 'aar')
-    implementation 'com.aientec.ktv:iot:0.0.6'
+    implementation 'com.aientec.ktv:iot:0.0.8'
 
     implementation project(path: ':ComOsd')
     implementation project(path: ':ineplayer_1_1_13')

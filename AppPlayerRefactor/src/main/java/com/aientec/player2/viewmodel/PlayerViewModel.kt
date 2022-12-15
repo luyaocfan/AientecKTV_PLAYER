@@ -2,6 +2,8 @@ package com.aientec.player2.viewmodel
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -84,6 +86,11 @@ class PlayerViewModel : ViewModel() {
 
     private var ratingTimer: Timer? = null
 
+//    private var nextTrackLocker: Boolean = false
+
+    /**
+     * 系統初始化
+     */
     fun systemInit(context: Context) {
         viewModelScope.launch {
             model = PlayerModel.getInstance(context)
@@ -105,30 +112,48 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 請求下一首歌
+     */
     fun nextTrackRequest() {
         viewModelScope.launch {
+//            nextTrackLocker = true
             Log.d(TAG, "OnNexReq")
             model.nextSongRequest()
         }
     }
 
+    /**
+     * 開始播放事件
+     */
     fun onPlayerStart() {
         viewModelScope.launch {
+//            nextTrackLocker = true
             mNextTrack = null
             model.notifyPlayFn(8)
             model.nextSongRequest()
             mIsIdle = false
+            Log.d("luyao", "fun onPlayerStart mIsIdle: $mIsIdle  playerState: $playerState.value")
         }
     }
 
+    /**
+     * 結束播放事件
+     */
     fun onPlayerEnd() {
         viewModelScope.launch {
             if (mNextTrack == null)
                 model.notifyPlayFn(9)
+
+            //if (playerState.value == PLAYER_STATE_PAUSE)
             mIsIdle = true
+            Log.d("luyao", "fun onPlayerEnd mIsIdle: $mIsIdle  playerState: $playerState.value")
         }
     }
 
+    /**
+     * 繼續播放事件
+     */
     fun onPlayerResume() {
         viewModelScope.launch {
             updateState(PLAYER_STATE_RESUME, false)
@@ -136,6 +161,9 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 暫停播放事件
+     */
     fun onPlayerPause() {
         viewModelScope.launch {
             updateState(PLAYER_STATE_PAUSE, true)
@@ -143,10 +171,16 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 切歌事件
+     */
     fun onPlayerCut() {
         updateState(PLAYER_STATE_CUT, false)
     }
 
+    /**
+     * 重唱事件
+     */
     fun onPlayerReplay() {
         viewModelScope.launch {
             updateState(PLAYER_STATE_REPLAY, false)
@@ -155,6 +189,9 @@ class PlayerViewModel : ViewModel() {
 
     }
 
+    /**
+     * 靜音切換事件
+     */
     fun onPlayerMuteToggle(mute: Boolean) {
         viewModelScope.launch {
             isMute.postValue(mute)
@@ -162,6 +199,9 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
+    /**
+     * MTV撥放改變
+     */
     fun onPlayerVocalChanged(type: Int) {
         viewModelScope.launch {
             when (type) {
@@ -173,7 +213,11 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 評分功能切換
+     */
     fun onPlayerRatingToggle(enable: Boolean) {
+
         if (enable) {
             ratingState.postValue(0)
             ratingTimer = Timer().apply {
@@ -189,8 +233,13 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 撥放狀態顯示實現
+     * @param state 撥放器狀態
+     * @param keep 是否讓顯示保留 true : 永久保留 false : 顯示1000毫秒後移除
+     */
     private fun updateState(state: Int, keep: Boolean) {
-
+        Log.d("luyao", "fun updateState state: $state  keep: $keep  mIsIdle: $mIsIdle")
         if (!mIsIdle) {
             mPlayerState = state
 
@@ -208,6 +257,10 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 左上角消息展示，1000毫秒後移除
+     * @param msg 顯示文字內容
+     */
     private fun updateNotifyMessage(msg: String) {
         notifyMessage.postValue(msg)
 
@@ -261,6 +314,7 @@ class PlayerViewModel : ViewModel() {
         object : PlayerModel.PlayerControlListener {
             override fun onAddTrack(track: Track?) {
                 mNextTrack = track
+//                nextTrackLocker = false
             }
 
             override fun onResume() {
@@ -272,7 +326,8 @@ class PlayerViewModel : ViewModel() {
             }
 
             override fun onCut() {
-                playerControl.postValue(PlayerControl.CUT)
+//                if (!nextTrackLocker)
+                    playerControl.postValue(PlayerControl.CUT)
             }
 
             override fun onReplay() {

@@ -10,9 +10,9 @@ android {
         applicationId "com.aientec.player2"
         minSdkVersion 25
         targetSdkVersion 32
-        versionCode 10
-        versionName "0.0.10"
-        project.archivesBaseName = "PLAYER_REFACTOR_DUAL_VIEW_${defaultConfig.versionName}"
+        versionCode 11
+        versionName "0.0.11"
+        project.archivesBaseName = "PLAYER_REFACTOR_OSD_${defaultConfig.versionName}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -64,19 +64,19 @@ android {
         }
         Dev {
             flavorDimensions 'model'
-            buildConfigField 'String', 'MTV_URL', "\"http://106.104.151.145:10011/mtv/%s\""
-            buildConfigField 'String', 'DS_SEVER', "\"106.104.151.145:40051\""
-            buildConfigField 'String', 'FILE_ROOT', "\"http://192.168.77.200:10001/\""
-            buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.77.200:10001/\""
-            buildConfigField 'String', 'PORTAL_SERVER', "\"http:/106.104.151.145:10002/index.php/\""
+            buildConfigField 'String', 'MTV_URL', "\"http://192.168.1.244:10011/%s\""
+            buildConfigField 'String', 'DS_SEVER', "\"192.168.1.230:10000\""
+            buildConfigField 'String', 'FILE_ROOT', "\"http://192.168.1.245:10001/\""
+            buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.1.245:10001/\""
+            buildConfigField 'String', 'PORTAL_SERVER', "\"http://192.168.1.245:10002/index.php/\""
         }
         hassen_local {
             flavorDimensions 'model'
-            buildConfigField 'String', 'MTV_URL', "\"http://192.168.99.152/%s\""
+            buildConfigField 'String', 'MTV_URL', "\"http://106.104.151.145:10011/mtv/%s\""
             buildConfigField 'String', 'DS_SEVER', "\"106.104.151.145:40051\""
-            buildConfigField 'String', 'FILE_ROOT', "\"http://192.168.77.200:10001/\""
-            buildConfigField 'String', 'IMG_ROOT', "\"http://192.168.77.200:10001/\""
-            buildConfigField 'String', 'PORTAL_SERVER', "\"http:/106.104.151.145:10002/index.php/\""
+            buildConfigField 'String', 'FILE_ROOT', "\"http://106.104.151.145:10001/\""
+            buildConfigField 'String', 'IMG_ROOT', "\"http://106.104.151.145:10001/\""
+            buildConfigField 'String', 'PORTAL_SERVER', "\"http://106.104.151.145:10002/index.php/\""
         }
     }
 }
@@ -109,10 +109,9 @@ dependencies {
 //    implementation(name: 'portal-0.0.1', ext: 'aar')
     implementation 'com.aientec.ktv:portal:0.0.5'
 //    implementation(name: 'iot-0.0.6', ext: 'aar')
-    implementation 'com.aientec.ktv:iot:0.0.5'
+    implementation 'com.aientec.ktv:iot:0.0.8'
 
     implementation project(path: ':ineplayer_1_1_13')
-    implementation project(path: ':ComOsd')
 //    implementation(name: 'extension-ffmpeg-debug', ext: 'aar')
 
 

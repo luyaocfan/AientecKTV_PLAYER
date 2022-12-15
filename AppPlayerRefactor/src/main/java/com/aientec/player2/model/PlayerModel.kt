@@ -1,9 +1,9 @@
 package com.aientec.player2.model
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.AssetManager
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import com.aientec.ktv_portal2.PortalResponse
 import com.aientec.ktv_portal2.PortalService2
 import com.aientec.ktv_wifiap.RoomWifiService
@@ -11,7 +11,6 @@ import com.aientec.ktv_wifiap.commands.*
 import com.aientec.player2.BuildConfig
 import com.aientec.player2.data.MessageBundle
 import com.aientec.structure.Track
-import com.aientec.structure.User
 import com.linecorp.apng.ApngDrawable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,8 +23,6 @@ import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.coroutines.CoroutineContext
 
 
@@ -116,6 +113,9 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
         wifiService.addListener(this, listener)
     }
 
+    /**
+     * 貼圖預載
+     */
     private fun preloadEmoji() {
         val asset: AssetManager = contextRef.get()!!.assets
 
@@ -162,7 +162,9 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
         return@withContext wifiService.connect()
     }
 
-
+    /**
+     * 更新公播歌單
+     */
     suspend fun updateIdleTracks(): List<Track>? = withContext(coroutineContext) {
         val response: PortalResponse = portalService.Store.getAdsTrackList()
 
@@ -184,6 +186,8 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
     *7、重唱
     *8、下一首(播放到下一首 vod player通知dataserver， dataserver广播给其他client)
     *9、点歌列表已播放完毕
+    *10、靜音
+    * 11、解除靜音
     *
     * */
     suspend fun notifyPlayFn(code: Int) = withContext(Dispatchers.IO) {
@@ -193,6 +197,9 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
         wifiService.playerControl(func)
     }
 
+    /**
+     * 請求下一首點播
+     */
     suspend fun nextSongRequest() = withContext(Dispatchers.IO) {
         wifiService.nextSongRequest()
     }
@@ -377,9 +384,12 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
             return@EventListener true
         }
 
+    @SuppressLint("Range")
     suspend fun _test() = withContext(coroutineContext) {
 
-        val apngDrawable = emojiMap["elephant.gif"]
+        val apngDrawable = emojiMap["elephant.gif"]?.apply {
+            loopCount =1
+        }
 
         val messageBundle: MessageBundle = MessageBundle()
         messageBundle.type = MessageBundle.Type.EMOJI
