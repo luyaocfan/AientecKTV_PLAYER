@@ -169,19 +169,6 @@ private fun OsdVideo(url: String, onDone: () -> Unit) {
     )
 }
 
-private fun getRotate(file: File): Int {
-    return try {
-        val exifInterface: ExifInterface = ExifInterface(file.absolutePath)
-        exifInterface.getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_NORMAL
-        )
-    } catch (e: IOException) {
-        Log.e("OSD", e.message.toString())
-        -90
-    }
-}
-
 /**
  * 根据图片exif信息纠正图片方向
  */

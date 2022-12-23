@@ -52,9 +52,12 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(LocalContext.current) {
                     viewModel.dataSyn.observe(this@MainActivity) {
                         if (it)
-                            navController.navigate("mtv")
+                            navController.navigate("mtv"){popUpTo("mtv")
+                                launchSingleTop=true
+                            }
                         else
-                            navController.navigate("prepare")
+                            navController.navigate("prepare"){popUpTo("prepare")
+                                launchSingleTop=true}
                     }
 
                     viewModel.toastMsg.observe(this@MainActivity) {

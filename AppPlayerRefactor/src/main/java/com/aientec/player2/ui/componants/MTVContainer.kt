@@ -3,16 +3,11 @@ package com.aientec.player2.ui.componants
 import android.content.Context
 import android.media.AudioManager
 import android.util.Log
-import android.view.SurfaceView
-import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
@@ -21,7 +16,6 @@ import com.aientec.player2.BuildConfig
 import com.aientec.player2.data.PlayerControl
 import com.aientec.player2.viewmodel.PlayerViewModel
 import com.aientec.structure.Track
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.audio.IneStereoVolumeProcessor
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
@@ -115,10 +109,13 @@ fun MTVContainer(viewModel: PlayerViewModel = PlayerViewModel()) {
                         )
                         viewModel.onPlayerMuteToggle(it.mute)
                     }
-                    PlayerControl.PAUSE -> {
+                    is PlayerControl.PAUSE -> {
                         if (!controller.isPaused) {
                             controller.pause()
-                            viewModel.onPlayerPause()
+                            if (it.osd)
+                                viewModel.onPlayerPause(controller)
+                            else
+                                viewModel.onPlayerPause(null)
                         }
                     }
                     PlayerControl.REPLAY -> {
@@ -291,6 +288,8 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: Aud
         super.onLoadingError(controller, Name, isPublicVideo)
         viewModel.onToast("onLoadingError ${if (isPublicVideo) "公播" else "點播"} $Name")
         if (!isPublicVideo) {
+            //controller?.cut()
+            //viewModel.onPlayerCut()
             viewModel.onPlayerEnd()
             adjustAudioVolume(am, true)
         }
@@ -305,6 +304,8 @@ private class InePlayerEventListener(val viewModel: PlayerViewModel, val am: Aud
         super.onPlayingError(controller, Name, Message, isPublicVideo)
         viewModel.onToast("onPlayingError ${if (isPublicVideo) "公播" else "點播"} $Name : $Message")
         if (!isPublicVideo) {
+            //controller?.cut()
+            //viewModel.onPlayerCut()
             viewModel.onPlayerEnd()
             adjustAudioVolume(am, true)
         }

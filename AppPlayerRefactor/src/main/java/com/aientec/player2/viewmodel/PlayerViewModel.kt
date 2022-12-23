@@ -2,8 +2,6 @@ package com.aientec.player2.viewmodel
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +9,7 @@ import com.aientec.player2.data.MessageBundle
 import com.aientec.player2.data.PlayerControl
 import com.aientec.player2.model.PlayerModel
 import com.aientec.structure.Track
+import com.ine.ktv.playerengine.InePlayerController
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -45,6 +44,7 @@ class PlayerViewModel : ViewModel() {
             isIdle.postValue(field)
         }
 
+    private var mController: InePlayerController? = null
     val isIdle: MutableLiveData<Boolean> = MutableLiveData()
 
     val notifyMessage: MutableLiveData<String?> = MutableLiveData()
@@ -133,7 +133,7 @@ class PlayerViewModel : ViewModel() {
             model.notifyPlayFn(8)
             model.nextSongRequest()
             mIsIdle = false
-            Log.d("luyao", "fun onPlayerStart mIsIdle: $mIsIdle  playerState: $playerState.value")
+            //Log.d("luyao", "fun onPlayerStart mIsIdle: $mIsIdle  playerState: $playerState.value")
         }
     }
 
@@ -147,7 +147,7 @@ class PlayerViewModel : ViewModel() {
 
             //if (playerState.value == PLAYER_STATE_PAUSE)
             mIsIdle = true
-            Log.d("luyao", "fun onPlayerEnd mIsIdle: $mIsIdle  playerState: $playerState.value")
+            //Log.d("luyao", "fun onPlayerEnd mIsIdle: $mIsIdle  playerState: $playerState.value")
         }
     }
 
@@ -159,16 +159,19 @@ class PlayerViewModel : ViewModel() {
             updateState(PLAYER_STATE_RESUME, false)
             model.notifyPlayFn(4)
         }
+        if (mController != null)
+            mController = null
     }
 
     /**
      * 暫停播放事件
      */
-    fun onPlayerPause() {
+    fun onPlayerPause(Controller: InePlayerController? = null) {
         viewModelScope.launch {
             updateState(PLAYER_STATE_PAUSE, true)
             model.notifyPlayFn(5)
         }
+        mController = Controller
     }
 
     /**
@@ -239,7 +242,7 @@ class PlayerViewModel : ViewModel() {
      * @param keep 是否讓顯示保留 true : 永久保留 false : 顯示1000毫秒後移除
      */
     private fun updateState(state: Int, keep: Boolean) {
-        Log.d("luyao", "fun updateState state: $state  keep: $keep  mIsIdle: $mIsIdle")
+        //Log.d("luyao", "fun updateState state: $state  keep: $keep  mIsIdle: $mIsIdle")
         if (!mIsIdle) {
             mPlayerState = state
 
@@ -278,6 +281,14 @@ class PlayerViewModel : ViewModel() {
     fun onOsdDone() {
         Log.d(TAG, "OnOsdDone")
         osdMessage.postValue(null)
+        if (mController != null)
+        {
+            if (mController?.isPaused == true) {
+                mController?.resume()
+                onPlayerResume()
+            }
+            mController = null
+        }
     }
 
     fun onToast(msg: String) {
@@ -321,8 +332,8 @@ class PlayerViewModel : ViewModel() {
                 playerControl.postValue(PlayerControl.RESUME)
             }
 
-            override fun onPause() {
-                playerControl.postValue(PlayerControl.PAUSE)
+            override fun onPause(osd: Boolean) {
+                playerControl.postValue(PlayerControl.PAUSE(osd))
             }
 
             override fun onCut() {

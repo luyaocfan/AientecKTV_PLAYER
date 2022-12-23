@@ -51,7 +51,7 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
     interface PlayerControlListener {
         fun onAddTrack(track: Track?)
         fun onResume()
-        fun onPause()
+        fun onPause(osd: Boolean = false)
         fun onCut()
         fun onReplay()
         fun onMuteToggle(mute: Boolean)
@@ -256,7 +256,7 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
                         DSData.PlayerFunc.BACKING_VOCALS -> playerControlListener?.onVocalChanged(2)
                         DSData.PlayerFunc.GUIDE_VOCAL -> playerControlListener?.onVocalChanged(3)
                         DSData.PlayerFunc.PLAY -> playerControlListener?.onResume()
-                        DSData.PlayerFunc.PAUSE -> playerControlListener?.onPause()
+                        DSData.PlayerFunc.PAUSE -> playerControlListener?.onPause(false)
                         DSData.PlayerFunc.CUT -> playerControlListener?.onCut()
                         DSData.PlayerFunc.REPLAY -> playerControlListener?.onReplay()
                         DSData.PlayerFunc.MUTE -> playerControlListener?.onMuteToggle(true)
@@ -360,6 +360,7 @@ class PlayerModel private constructor(context: Context) : CoroutineScope {
                                 remoteFile,
                                 String(mData.data ?: return@EventListener false)
                             )
+                            playerControlListener?.onPause(true)
                         }
                         TmsData.Type.EMOJI -> {
                             val inputStream: InputStream =
